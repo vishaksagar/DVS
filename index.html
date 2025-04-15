@@ -258,13 +258,13 @@
     let currentPath = '';
 
     function fixRelativeImagePaths(markdown, filePath) {
-  const basePath = filePath.substring(0, filePath.lastIndexOf('/'));
-  return markdown.replace(/!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g, (match, alt, relPath) => {
-    const fullPath = `${basePath}/${relPath}`.replace(/\/+/g, '/');
-    const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${fullPath}`;
-    return `![${alt}](${rawUrl})`;
-  });
-}
+      const basePath = filePath.substring(0, filePath.lastIndexOf('/'));
+      return markdown.replace(/!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g, (match, alt, relPath) => {
+        const fullPath = `${basePath}/${relPath}`.replace(/\/+/g, '/');
+        const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${fullPath}`;
+        return `![${alt}](${rawUrl})`;
+      });
+    }
 
     function toggleTheme() {
       const isDark = document.body.getAttribute('data-theme') === 'dark';
@@ -286,12 +286,14 @@
       const parts = path ? path.split('/') : [];
       const breadcrumb = document.getElementById('breadcrumb');
       
-      let html = `<a href="#" onclick="navigateTo('')">DVS</a>`;
+      let html = `<a href="#" onclick="navigateTo(''); return false;">DVS</a>`;
       let currentPath = '';
       
       parts.forEach((part, index) => {
-        currentPath += (index === 0 ? part : '/' + part);
-        html += ` / <a href="#" onclick="navigateTo('${currentPath}')">${part}</a>`;
+        if (part) {
+          currentPath += (currentPath ? '/' : '') + part;
+          html += ` / <a href="#" onclick="navigateTo('${currentPath}'); return false;">${part}</a>`;
+        }
       });
       
       breadcrumb.innerHTML = html;
@@ -304,11 +306,13 @@
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
       try {
         const response = await fetch(apiUrl);
+
         if (response.ok) {
           const contents = await response.json();
           displayContents(contents, path);
           fileContents.innerHTML = '';
           updateBreadcrumb(path);
+          currentPath = path;
         } else {
           throw new Error('Failed to fetch contents');
         }
@@ -323,8 +327,8 @@
       fileList.innerHTML = '';
       
       if (path !== '') {
-        const parentPath = path.substring(0, path.lastIndexOf('/'));
-        fileList.innerHTML += `<li><a href="#" onclick="navigateTo('${parentPath}')">..</a></li>`;
+        const parentPath = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : '';
+        fileList.innerHTML += `<li><a href="#" onclick="navigateTo('${parentPath}'); return false;">..</a></li>`;
       }
 
       // Sort contents: directories first, then files
@@ -338,134 +342,137 @@
       contents.forEach(item => {
         const listItem = document.createElement('li');
         if (item.type === 'dir') {
-          listItem.innerHTML = `<a href="#" onclick="navigateTo('${item.path}')">📁 ${item.name}/</a>`;
+          listItem.innerHTML = `<a href="#" onclick="navigateTo('${item.path}'); return false;">📁 ${item.name}/</a>`;
         } else {
-          listItem.innerHTML = `<a href="#" onclick="viewFile('${item.path}')">📄 ${item.name}</a>`;
+          listItem.innerHTML = `<a href="#" onclick="viewFile('${item.path}'); return false;">📄 ${item.name}</a>`;
         }
         fileList.appendChild(listItem);
       });
     }
 
-   async function viewFile(filePath) {
-  const fileContents = document.getElementById('file-contents');
-  fileContents.innerHTML = '<div class="loading">Loading file contents...</div>';
-  
-  const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}?ref=${branch}`;
-  try {
-    const response = await fetch(apiUrl);
-    if (response.ok) {
-      const fileData = await response.json();
-      const isPdf = filePath.toLowerCase().endsWith('.pdf');
+    async function viewFile(filePath) {
+      const fileContents = document.getElementById('file-contents');
+      fileContents.innerHTML = '<div class="loading">Loading file contents...</div>';
       
-      if (isPdf) {
-        // For PDFs, always fetch the raw content using download_url
-        if (fileData.download_url) {
-          const pdfResponse = await fetch(fileData.download_url);
-          if (!pdfResponse.ok) throw new Error('Failed to fetch PDF content');
+      // Update URL to include the file path
+      history.pushState({ path: filePath, isFile: true }, '', `#${filePath}`);
+      
+      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}?ref=${branch}`;
+      try {
+        const response = await fetch(apiUrl);
+
+        if (response.ok) {
+          const fileData = await response.json();
+          const isPdf = filePath.toLowerCase().endsWith('.pdf');
           
-          // Create a blob with proper MIME type
-          const pdfBlob = await pdfResponse.blob();
-          const properPdfBlob = new Blob([pdfBlob], { type: 'application/pdf' });
-          const pdfUrl = URL.createObjectURL(properPdfBlob);
-          
-          // For Android, we'll use Google Docs viewer
-          const isAndroid = /Android/i.test(navigator.userAgent);
-          if (isAndroid) {
-            const googleDocsUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileData.download_url)}`;
-            displayFileContents(filePath, googleDocsUrl, true, 'android');
+          if (isPdf) {
+            // For PDFs, always fetch the raw content using download_url
+            if (fileData.download_url) {
+              const pdfResponse = await fetch(fileData.download_url);
+              if (!pdfResponse.ok) throw new Error('Failed to fetch PDF content');
+              
+              // Create a blob with proper MIME type
+              const pdfBlob = await pdfResponse.blob();
+              const properPdfBlob = new Blob([pdfBlob], { type: 'application/pdf' });
+              const pdfUrl = URL.createObjectURL(properPdfBlob);
+              
+              // For Android, we'll use Google Docs viewer
+              const isAndroid = /Android/i.test(navigator.userAgent);
+              if (isAndroid) {
+                const googleDocsUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileData.download_url)}`;
+                displayFileContents(filePath, googleDocsUrl, true, 'android');
+              } else {
+                displayFileContents(filePath, pdfUrl, true, 'desktop');
+              }
+            } else {
+              throw new Error('PDF download URL not available');
+            }
           } else {
-            displayFileContents(filePath, pdfUrl, true, 'desktop');
+            // Handle other file types as before
+            if (fileData.content) {
+              const decodedContent = atob(fileData.content.replace(/\n/g, ''));
+              displayFileContents(filePath, decodedContent, false);
+            } else if (fileData.download_url) {
+              const textResponse = await fetch(fileData.download_url);
+              const textContent = await textResponse.text();
+              displayFileContents(filePath, textContent, false);
+            } else {
+              throw new Error('No content available');
+            }
           }
         } else {
-          throw new Error('PDF download URL not available');
+          throw new Error('Failed to load file');
+        }
+      } catch (error) {
+        fileContents.innerHTML = `<div class="error">Error loading file contents: ${error.message}</div>`;
+      }
+    }
+
+    function displayFileContents(filePath, content, isPdf, platform = 'desktop') {
+      const fileContentsDiv = document.getElementById('file-contents');
+      let html = `<div class="file-header">${filePath}</div>`;
+      
+      if (isPdf) {
+        if (platform === 'android') {
+          // Use Google Docs viewer for Android
+          html += `
+            <div class="pdf-container">
+              <iframe 
+                class="pdf-viewer" 
+                src="${content}"
+                frameborder="0"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <div style="margin-top: 10px; text-align: center;">
+              <a href="${content.replace('gview?embedded=true&', '')}" 
+                 target="_blank" 
+                 class="theme-toggle" 
+                 style="text-decoration: none;">
+                Open in New Tab
+              </a>
+            </div>`;
+        } else {
+          // Use native PDF viewer for desktop
+          html += `
+            <div class="pdf-container">
+              <iframe 
+                class="pdf-viewer" 
+                src="${content}"
+                type="application/pdf"
+              ></iframe>
+            </div>
+            <div style="margin-top: 10px; text-align: center;">
+              <a href="${content}" 
+                 target="_blank" 
+                 class="theme-toggle" 
+                 style="text-decoration: none;">
+                Open in New Tab
+              </a>
+            </div>`;
+        }
+        
+        // Clean up the object URL when the content changes
+        if (platform === 'desktop') {
+          const cleanup = () => {
+            URL.revokeObjectURL(content);
+            fileContentsDiv.removeEventListener('DOMNodeRemoved', cleanup);
+          };
+          fileContentsDiv.addEventListener('DOMNodeRemoved', cleanup);
         }
       } else {
-        // Handle other file types as before
-        if (fileData.content) {
-          const decodedContent = atob(fileData.content.replace(/\n/g, ''));
-          displayFileContents(filePath, decodedContent, false);
-        } else if (fileData.download_url) {
-          const textResponse = await fetch(fileData.download_url);
-          const textContent = await textResponse.text();
-          displayFileContents(filePath, textContent, false);
+        const isMarkdown = filePath.toLowerCase().endsWith('.md');
+        if (isMarkdown) {
+          const fixedContent = fixRelativeImagePaths(content, filePath);
+          const renderedContent = marked.parse(fixedContent);
+          html += `<div class="markdown-body">${renderedContent}</div>`;
         } else {
-          throw new Error('No content available');
+          html += `<pre><code>${escapeHtml(content)}</code></pre>`;
         }
       }
-    } else {
-      throw new Error('Failed to load file');
+      
+      fileContentsDiv.innerHTML = html;
     }
-  } catch (error) {
-    fileContents.innerHTML = `<div class="error">Error loading file contents: ${error.message}</div>`;
-  }
-}
-
-function displayFileContents(filePath, content, isPdf, platform = 'desktop') {
-  const fileContentsDiv = document.getElementById('file-contents');
-  let html = `<div class="file-header">${filePath}</div>`;
-  
-  if (isPdf) {
-    if (platform === 'android') {
-      // Use Google Docs viewer for Android
-      html += `
-        <div class="pdf-container">
-          <iframe 
-            class="pdf-viewer" 
-            src="${content}"
-            frameborder="0"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <div style="margin-top: 10px; text-align: center;">
-          <a href="${content.replace('gview?embedded=true&', '')}" 
-             target="_blank" 
-             class="theme-toggle" 
-             style="text-decoration: none;">
-            Open in New Tab
-          </a>
-        </div>`;
-    } else {
-      // Use native PDF viewer for desktop
-      html += `
-        <div class="pdf-container">
-          <iframe 
-            class="pdf-viewer" 
-            src="${content}"
-            type="application/pdf"
-          ></iframe>
-        </div>
-        <div style="margin-top: 10px; text-align: center;">
-          <a href="${content}" 
-             target="_blank" 
-             class="theme-toggle" 
-             style="text-decoration: none;">
-            Open in New Tab
-          </a>
-        </div>`;
-    }
-    
-    // Clean up the object URL when the content changes
-    if (platform === 'desktop') {
-      const cleanup = () => {
-        URL.revokeObjectURL(content);
-        fileContentsDiv.removeEventListener('DOMNodeRemoved', cleanup);
-      };
-      fileContentsDiv.addEventListener('DOMNodeRemoved', cleanup);
-    }
-  } else {
-    const isMarkdown = filePath.toLowerCase().endsWith('.md');
-    if (isMarkdown) {
-      const fixedContent = fixRelativeImagePaths(content, filePath);
-const renderedContent = marked.parse(fixedContent);
-
-      html += `<div class="markdown-body">${renderedContent}</div>`;
-    } else {
-      html += `<pre><code>${escapeHtml(content)}</code></pre>`;
-    }
-  }
-  
-  fileContentsDiv.innerHTML = html;
-}
 
     function escapeHtml(text) {
       const div = document.createElement('div');
@@ -474,12 +481,47 @@ const renderedContent = marked.parse(fixedContent);
     }
 
     function navigateTo(path) {
-      currentPath = path;
+      // Update the browser URL
+      history.pushState({ path, isFile: false }, '', path ? `/${path}` : '/');
       fetchRepoContents(path);
     }
 
-    // Initial fetch
-    fetchRepoContents();
+    // Handle back/forward navigation
+    window.addEventListener('popstate', (event) => {
+      if (event.state) {
+        if (event.state.isFile) {
+          viewFile(event.state.path);
+        } else {
+          fetchRepoContents(event.state.path || '');
+        }
+      } else {
+        // Default to root if no state
+        fetchRepoContents('');
+      }
+    });
+
+    // Initial fetch based on URL
+    function initFromUrl() {
+      let initialPath = '';
+      
+      // Check if URL has a hash fragment first (for file viewing)
+      if (window.location.hash) {
+        const filePath = window.location.hash.substring(1);
+        viewFile(filePath);
+        return;
+      }
+      
+      // Otherwise check the pathname
+      initialPath = window.location.pathname.replace(/^\/+/, '');
+      if (initialPath) {
+        fetchRepoContents(decodeURIComponent(initialPath));
+      } else {
+        fetchRepoContents('');
+      }
+    }
+
+    // Start the application
+    initFromUrl();
   </script>
 </body>
 </html>
