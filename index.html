@@ -17,7 +17,6 @@
       --link-color: #0366d6;
       --pre-bg: #f4f4f4;
     }
-
     [data-theme="dark"] {
       /* Catppuccin Mocha palette */
       --bg-color: #1e1e2e;        /* Base */
@@ -35,7 +34,6 @@
       --red: #f38ba8;             /* Red */
       --yellow: #f9e2af;          /* Yellow */
     }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       padding: 20px;
@@ -44,13 +42,11 @@
       color: var(--text-color);
       transition: background-color 0.3s ease;
     }
-
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 15px;
     }
-
     .header {
       display: flex;
       justify-content: space-between;
@@ -59,7 +55,6 @@
       flex-wrap: wrap;
       gap: 10px;
     }
-
     .theme-toggle {
       background: var(--surface0);
       border: 1px solid var(--border-color);
@@ -70,12 +65,10 @@
       font-size: 14px;
       transition: all 0.2s ease;
     }
-
     [data-theme="dark"] .theme-toggle:hover {
       background: var(--surface1);
       border-color: var(--accent);
     }
-
     ul {
       list-style-type: none;
       padding: 0;
@@ -84,27 +77,22 @@
       border-radius: 6px;
       margin: 0;
     }
-
     li {
       margin: 0;
       border-bottom: 1px solid var(--border-color);
     }
-
     li:last-child {
       border-bottom: none;
     }
-
     li a {
       padding: 8px 16px;
       display: block;
       color: var(--link-color);
       text-decoration: none;
     }
-
     [data-theme="dark"] li a:hover {
       background: var(--surface0);
     }
-
     pre {
       background: var(--pre-bg);
       padding: 16px;
@@ -114,11 +102,9 @@
       margin: 0;
       color: var(--text-color);
     }
-
     #file-contents {
       margin-top: 20px;
     }
-
     .markdown-body {
       box-sizing: border-box;
       min-width: 200px;
@@ -130,7 +116,6 @@
       background-color: var(--bg-color) !important;
       color: var(--text-color) !important;
     }
-
     .file-header {
       padding: 16px;
       background: var(--header-bg);
@@ -141,26 +126,21 @@
       font-size: 14px;
       color: var(--subtext0);
     }
-
     /* Dark theme overrides for markdown content */
     [data-theme="dark"] .markdown-body {
       color-scheme: dark;
     }
-
     [data-theme="dark"] .markdown-body a {
       color: var(--link-color);
     }
-
     [data-theme="dark"] .markdown-body hr {
       border-color: var(--border-color);
     }
-
     [data-theme="dark"] .markdown-body blockquote {
       color: var(--subtext0);
       border-left-color: var(--surface1);
       background: var(--surface0);
     }
-
     [data-theme="dark"] .markdown-body h1,
     [data-theme="dark"] .markdown-body h2,
     [data-theme="dark"] .markdown-body h3,
@@ -170,12 +150,10 @@
       color: var(--accent);
       border-bottom-color: var(--border-color);
     }
-
     [data-theme="dark"] .markdown-body code {
       background: var(--pre-bg);
       color: var(--green);
     }
-
     .breadcrumb {
       margin-bottom: 15px;
       padding: 8px 16px;
@@ -185,17 +163,14 @@
       overflow-x: auto;
       white-space: nowrap;
     }
-
     [data-theme="dark"] .breadcrumb a {
       color: var(--link-color);
     }
-
     .loading {
       text-align: center;
       padding: 20px;
       color: var(--text-color);
     }
-
     /* PDF viewer styles */
     .pdf-container {
       width: 100%;
@@ -203,37 +178,30 @@
       border: 1px solid var(--border-color);
       border-radius: 0 0 6px 6px;
     }
-
     .pdf-viewer {
       width: 100%;
       height: 100%;
       border: none;
     }
-
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
       body {
         padding: 10px;
       }
-
       .header {
         flex-direction: column;
         align-items: flex-start;
       }
-
       .markdown-body {
         padding: 15px;
       }
-
       pre {
         max-width: 100%;
         font-size: 14px;
       }
-
       .file-header {
         font-size: 12px;
       }
-
       .pdf-container {
         height: 500px;
       }
@@ -250,21 +218,13 @@
     <ul id="file-list"></ul>
     <div id="file-contents"></div>
   </div>
-
   <script>
     const username = 'vishaksagar';
     const repo = 'DVS';
     const branch = 'main';
     let currentPath = '';
-
-    function fixRelativeImagePaths(markdown, filePath) {
-      const basePath = filePath.substring(0, filePath.lastIndexOf('/'));
-      return markdown.replace(/!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g, (match, alt, relPath) => {
-        const fullPath = `${basePath}/${relPath}`.replace(/\/+/g, '/');
-        const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${fullPath}`;
-        return `![${alt}](${rawUrl})`;
-      });
-    }
+    let currentFile = null;
+    let isViewingFile = false;
 
     function toggleTheme() {
       const isDark = document.body.getAttribute('data-theme') === 'dark';
@@ -282,18 +242,38 @@
       mangle: false
     });
 
+    // URL handling functions
+    function updateUrlWithPath(path, isFile = false) {
+      const hash = isFile ? `#file=${encodeURIComponent(path)}` : `#path=${encodeURIComponent(path)}`;
+      window.history.pushState(null, '', hash);
+    }
+
+    function parseUrlForPath() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#file=')) {
+        const filePath = decodeURIComponent(hash.substring(6));
+        viewFile(filePath);
+        return;
+      }
+      if (hash.startsWith('#path=')) {
+        const path = decodeURIComponent(hash.substring(6));
+        navigateTo(path, false);
+        return;
+      }
+      // Default to root if no hash
+      navigateTo('', false);
+    }
+
     function updateBreadcrumb(path) {
       const parts = path ? path.split('/') : [];
       const breadcrumb = document.getElementById('breadcrumb');
       
-      let html = `<a href="#" onclick="navigateTo(''); return false;">DVS</a>`;
+      let html = `<a href="#" onclick="navigateTo(''); return false;">root</a>`;
       let currentPath = '';
       
       parts.forEach((part, index) => {
-        if (part) {
-          currentPath += (currentPath ? '/' : '') + part;
-          html += ` / <a href="#" onclick="navigateTo('${currentPath}'); return false;">${part}</a>`;
-        }
+        currentPath += (index === 0 ? part : '/' + part);
+        html += ` / <a href="#" onclick="navigateTo('${currentPath}'); return false;">${part}</a>`;
       });
       
       breadcrumb.innerHTML = html;
@@ -306,13 +286,11 @@
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
       try {
         const response = await fetch(apiUrl);
-
         if (response.ok) {
           const contents = await response.json();
           displayContents(contents, path);
           fileContents.innerHTML = '';
           updateBreadcrumb(path);
-          currentPath = path;
         } else {
           throw new Error('Failed to fetch contents');
         }
@@ -327,10 +305,9 @@
       fileList.innerHTML = '';
       
       if (path !== '') {
-        const parentPath = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : '';
+        const parentPath = path.substring(0, path.lastIndexOf('/'));
         fileList.innerHTML += `<li><a href="#" onclick="navigateTo('${parentPath}'); return false;">..</a></li>`;
       }
-
       // Sort contents: directories first, then files
       contents.sort((a, b) => {
         if (a.type !== b.type) {
@@ -338,7 +315,6 @@
         }
         return a.name.localeCompare(b.name);
       });
-
       contents.forEach(item => {
         const listItem = document.createElement('li');
         if (item.type === 'dir') {
@@ -351,16 +327,16 @@
     }
 
     async function viewFile(filePath) {
+      isViewingFile = true;
+      currentFile = filePath;
+      updateUrlWithPath(filePath, true);
+      
       const fileContents = document.getElementById('file-contents');
       fileContents.innerHTML = '<div class="loading">Loading file contents...</div>';
-      
-      // Update URL to include the file path
-      history.pushState({ path: filePath, isFile: true }, '', `#${filePath}`);
       
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}?ref=${branch}`;
       try {
         const response = await fetch(apiUrl);
-
         if (response.ok) {
           const fileData = await response.json();
           const isPdf = filePath.toLowerCase().endsWith('.pdf');
@@ -463,8 +439,7 @@
       } else {
         const isMarkdown = filePath.toLowerCase().endsWith('.md');
         if (isMarkdown) {
-          const fixedContent = fixRelativeImagePaths(content, filePath);
-          const renderedContent = marked.parse(fixedContent);
+          const renderedContent = marked.parse(content);
           html += `<div class="markdown-body">${renderedContent}</div>`;
         } else {
           html += `<pre><code>${escapeHtml(content)}</code></pre>`;
@@ -472,6 +447,10 @@
       }
       
       fileContentsDiv.innerHTML = html;
+      
+      // Update breadcrumb to show the path to the file
+      const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
+      updateBreadcrumb(dirPath);
     }
 
     function escapeHtml(text) {
@@ -480,48 +459,25 @@
       return div.innerHTML;
     }
 
-    function navigateTo(path) {
-      // Update the browser URL
-      history.pushState({ path, isFile: false }, '', path ? `/${path}` : '/');
+    function navigateTo(path, updateUrl = true) {
+      currentPath = path;
+      isViewingFile = false;
+      currentFile = null;
+      
+      if (updateUrl) {
+        updateUrlWithPath(path, false);
+      }
+      
       fetchRepoContents(path);
     }
 
-    // Handle back/forward navigation
-    window.addEventListener('popstate', (event) => {
-      if (event.state) {
-        if (event.state.isFile) {
-          viewFile(event.state.path);
-        } else {
-          fetchRepoContents(event.state.path || '');
-        }
-      } else {
-        // Default to root if no state
-        fetchRepoContents('');
-      }
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+      parseUrlForPath();
     });
 
-    // Initial fetch based on URL
-    function initFromUrl() {
-      let initialPath = '';
-      
-      // Check if URL has a hash fragment first (for file viewing)
-      if (window.location.hash) {
-        const filePath = window.location.hash.substring(1);
-        viewFile(filePath);
-        return;
-      }
-      
-      // Otherwise check the pathname
-      initialPath = window.location.pathname.replace(/^\/+/, '');
-      if (initialPath) {
-        fetchRepoContents(decodeURIComponent(initialPath));
-      } else {
-        fetchRepoContents('');
-      }
-    }
-
-    // Start the application
-    initFromUrl();
+    // Initial load - parse URL for path or file
+    parseUrlForPath();
   </script>
 </body>
 </html>
