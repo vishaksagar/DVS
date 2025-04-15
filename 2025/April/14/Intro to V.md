@@ -6,7 +6,7 @@ So I plan to use this space as a medium to have that dialogue, albeit internal, 
 
 I'll start today with a quote from one of my favorite movie/book - V for Vendetta
 
-**“Voilà! In view, a humble vaudevillian veteran cast vicariously as both victim and villain by the vicissitudes of fate.....**
+**Voila! In view, a humble vaudevillian veteran cast vicariously as both victim and villain by the vicissitudes of fate.....**
 
 ![V's Intro quote](./IMG_20250415_092308731.jpg)
 
