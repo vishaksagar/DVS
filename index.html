@@ -313,9 +313,6 @@
           fileContents.innerHTML = '';
           updateBreadcrumb(path);
           currentPath = path;
-          
-          // Update the URL to reflect the current path
-          updateURL(path);
         } else {
           throw new Error('Failed to fetch contents');
         }
@@ -323,12 +320,6 @@
         document.getElementById('file-list').innerHTML = '<li class="error">Error fetching contents.</li>';
         fileContents.innerHTML = '';
       }
-    }
-
-    function updateURL(path) {
-      // Update the browser URL without reloading the page
-      const newURL = path ? `/${path}` : '/';
-      history.pushState({ path }, '', newURL);
     }
 
     function displayContents(contents, path) {
@@ -362,6 +353,9 @@
     async function viewFile(filePath) {
       const fileContents = document.getElementById('file-contents');
       fileContents.innerHTML = '<div class="loading">Loading file contents...</div>';
+      
+      // Update URL to include the file path
+      history.pushState({ path: filePath, isFile: true }, '', `#${filePath}`);
       
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}?ref=${branch}`;
       try {
@@ -487,26 +481,40 @@
     }
 
     function navigateTo(path) {
-      currentPath = path;
+      // Update the browser URL
+      history.pushState({ path, isFile: false }, '', path ? `/${path}` : '/');
       fetchRepoContents(path);
     }
 
-    // Handle browser back/forward buttons
+    // Handle back/forward navigation
     window.addEventListener('popstate', (event) => {
-      if (event.state && event.state.path !== undefined) {
-        fetchRepoContents(event.state.path);
+      if (event.state) {
+        if (event.state.isFile) {
+          viewFile(event.state.path);
+        } else {
+          fetchRepoContents(event.state.path || '');
+        }
       } else {
         // Default to root if no state
         fetchRepoContents('');
       }
     });
 
-    // Initialize based on current URL path
+    // Initial fetch based on URL
     function initFromUrl() {
-      // Get the path from the URL, removing leading slash
-      const urlPath = window.location.pathname.replace(/^\/+/, '');
-      if (urlPath) {
-        fetchRepoContents(decodeURIComponent(urlPath));
+      let initialPath = '';
+      
+      // Check if URL has a hash fragment first (for file viewing)
+      if (window.location.hash) {
+        const filePath = window.location.hash.substring(1);
+        viewFile(filePath);
+        return;
+      }
+      
+      // Otherwise check the pathname
+      initialPath = window.location.pathname.replace(/^\/+/, '');
+      if (initialPath) {
+        fetchRepoContents(decodeURIComponent(initialPath));
       } else {
         fetchRepoContents('');
       }
