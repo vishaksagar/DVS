@@ -225,6 +225,14 @@
     let currentPath = '';
     let currentFile = null;
     let isViewingFile = false;
+    function fixRelativeImagePaths(markdown, filePath) {
+      const basePath = filePath.substring(0, filePath.lastIndexOf('/'));
+      return markdown.replace(/!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g, (match, alt, relPath) => {
+        const fullPath = `${basePath}/${relPath}`.replace(/\/+/g, '/');
+        const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${fullPath}`;
+        return `![${alt}](${rawUrl})`;
+      });
+    }
 
     function toggleTheme() {
       const isDark = document.body.getAttribute('data-theme') === 'dark';
@@ -439,7 +447,8 @@
       } else {
         const isMarkdown = filePath.toLowerCase().endsWith('.md');
         if (isMarkdown) {
-          const renderedContent = marked.parse(content);
+          const fixedContent = fixRelativeImagePaths(content, filePath);
+          const renderedContent = marked.parse(fixedContent);
           html += `<div class="markdown-body">${renderedContent}</div>`;
         } else {
           html += `<pre><code>${escapeHtml(content)}</code></pre>`;
