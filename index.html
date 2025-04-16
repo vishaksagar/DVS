@@ -307,15 +307,24 @@
       const parts = path ? path.split('/') : [];
       const breadcrumb = document.getElementById('breadcrumb');
       
-      let html = `<a href="#" onclick="navigateTo(''); return false;">DVS</a>`;
+      let html = `<a href="#" data-path="" class="navigation-link">DVS</a>`;
       let currentPath = '';
       
       parts.forEach((part, index) => {
         currentPath += (index === 0 ? part : '/' + part);
-        html += ` / <a href="#" onclick="navigateTo('${currentPath}'); return false;">${part}</a>`;
+        html += ` / <a href="#" data-path="${currentPath}" class="navigation-link">${part}</a>`;
       });
       
       breadcrumb.innerHTML = html;
+      
+      // Add event listeners to the newly created breadcrumb links
+      document.querySelectorAll('#breadcrumb .navigation-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const path = this.getAttribute('data-path');
+          navigateTo(path);
+        });
+      });
     }
 
     async function fetchRepoContents(path = '') {
@@ -358,7 +367,14 @@
       
       if (path !== '') {
         const parentPath = path.substring(0, path.lastIndexOf('/'));
-        fileList.innerHTML += `<li><a href="#" onclick="navigateTo('${parentPath}'); return false;">..</a></li>`;
+        const parentItem = document.createElement('li');
+        const parentLink = document.createElement('a');
+        parentLink.href = '#';
+        parentLink.textContent = '..';
+        parentLink.setAttribute('data-path', parentPath);
+        parentLink.classList.add('navigation-link');
+        parentItem.appendChild(parentLink);
+        fileList.appendChild(parentItem);
       }
       
       // Sort contents: directories first, then files
@@ -371,12 +387,38 @@
       
       contents.forEach(item => {
         const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = '#';
+        
         if (item.type === 'dir') {
-          listItem.innerHTML = `<a href="#" onclick="navigateTo('${item.path}'); return false;">📁 ${item.name}/</a>`;
+          link.textContent = `📁 ${item.name}/`;
+          link.setAttribute('data-path', item.path);
+          link.classList.add('navigation-link');
         } else {
-          listItem.innerHTML = `<a href="#" onclick="viewFile('${item.path}'); return false;">📄 ${item.name}</a>`;
+          link.textContent = `📄 ${item.name}`;
+          link.setAttribute('data-file', item.path);
+          link.classList.add('file-link');
         }
+        
+        listItem.appendChild(link);
         fileList.appendChild(listItem);
+      });
+      
+      // Add event listeners to the newly created links
+      document.querySelectorAll('#file-list .navigation-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const path = this.getAttribute('data-path');
+          navigateTo(path);
+        });
+      });
+      
+      document.querySelectorAll('#file-list .file-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const filePath = this.getAttribute('data-file');
+          viewFile(filePath);
+        });
       });
     }
 
