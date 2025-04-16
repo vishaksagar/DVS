@@ -216,7 +216,6 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>DVS</h1>
       <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
     </div>
     <div class="breadcrumb" id="breadcrumb"></div>
@@ -384,8 +383,20 @@
         }
         return a.name.localeCompare(b.name);
       });
+
+      // Filter contents based on path and file type
+      const filteredContents = contents.filter(item => {
+        // Always show directories
+        if (item.type === 'dir') return true;
+        
+        // Special case for assets folder - show no files
+        if (path === 'assets') return false;
+        
+        // For other paths, only show .md files
+        return item.name.toLowerCase().endsWith('.md');
+      });
       
-      contents.forEach(item => {
+      filteredContents.forEach(item => {
         const listItem = document.createElement('li');
         const link = document.createElement('a');
         link.href = '#';
