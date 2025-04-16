@@ -386,11 +386,14 @@
 
       // Filter contents based on path and file type
       const filteredContents = contents.filter(item => {
+        // Hide assets folder when in root directory
+        if (path === '' && item.type === 'dir' && item.name === 'assets') return false;
+
         // Always show directories
         if (item.type === 'dir') return true;
         
-        // Special case for assets folder - show no files
-        if (path === 'assets') return false;
+        // // Special case for assets folder - show no files
+        // if (path === 'assets') return false;
         
         // For other paths, only show .md files
         return item.name.toLowerCase().endsWith('.md');
