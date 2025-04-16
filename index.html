@@ -230,6 +230,32 @@
     let currentPath = '';
     let currentFile = null;
     let isViewingFile = false;
+
+    // Add this function to update meta tags based on current content
+    function updateMetaTags(title, description, imagePath) {
+      // Default values
+      const defaultTitle = "DVS";
+      const defaultDesc = "A journal, a blog, a voice of sorts, the world as I see it and my ruminations on it.";
+      const defaultImage = "https://raw.githubusercontent.com/vishaksagar/DVS/main/assets/blank_piece_of_paper.jpg";
+      
+      // Set new values or use defaults
+      document.querySelector('meta[property="og:title"]').setAttribute('content', title || defaultTitle);
+      document.querySelector('meta[property="og:description"]').setAttribute('content', description || defaultDesc);
+      document.querySelector('meta[property="og:image"]').setAttribute('content', imagePath || defaultImage);
+      
+      // // Update Twitter card meta tags too if they exist
+      // const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+      // const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+      // const twitterImage = document.querySelector('meta[name="twitter:image"]');
+      
+      // if (twitterTitle) twitterTitle.setAttribute('content', title || defaultTitle);
+      // if (twitterDesc) twitterDesc.setAttribute('content', description || defaultDesc);
+      // if (twitterImage) twitterImage.setAttribute('content', imagePath || defaultImage);
+      
+      // Also update the page title
+      document.title = title || defaultTitle;
+    }
+
     function fixRelativeImagePaths(markdown, filePath) {
       const basePath = filePath.substring(0, filePath.lastIndexOf('/'));
       return markdown.replace(/!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g, (match, alt, relPath) => {
@@ -352,6 +378,44 @@
         const response = await fetch(apiUrl);
         if (response.ok) {
           const fileData = await response.json();
+          const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+          const fileTitle = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
+          
+          // Check if there are images in the same directory
+          const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
+          let imagePath = null;
+          
+          // Try to find an image in the same directory
+          try {
+            const dirApiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${dirPath}?ref=${branch}`;
+            const dirResponse = await fetch(dirApiUrl);
+            if (dirResponse.ok) {
+              const dirContents = await dirResponse.json();
+              // Look for image files
+              const imageFile = dirContents.find(item => 
+                /\.(jpe?g|png|gif)$/i.test(item.name)
+              );
+              if (imageFile) {
+                imagePath = imageFile.download_url;
+              }
+            }
+          } catch (error) {
+            console.log("Error fetching directory contents:", error);
+          }
+          
+          // Update meta tags with file info
+          let description = ""; 
+          // For markdown files, try to extract first paragraph for description
+          if (filePath.toLowerCase().endsWith('.md') && fileData.content) {
+            const decodedContent = atob(fileData.content.replace(/\n/g, ''));
+            const firstParagraph = decodedContent.match(/[^\r\n]+/);
+            if (firstParagraph && firstParagraph[0]) {
+              description = firstParagraph[0].substring(0, 160); // Limit description length
+            }
+          }
+          
+          updateMetaTags(fileTitle, description, imagePath);
+          
           const isPdf = filePath.toLowerCase().endsWith('.pdf');
           
           if (isPdf) {
@@ -473,17 +537,54 @@
       return div.innerHTML;
     }
 
-    function navigateTo(path, updateUrl = true) {
-      currentPath = path;
-      isViewingFile = false;
-      currentFile = null;
-      
-      if (updateUrl) {
-        updateUrlWithPath(path, false);
-      }
-      
-      fetchRepoContents(path);
+    async function navigateTo(path, updateUrl = true) {
+    currentPath = path;
+    isViewingFile = false;
+    currentFile = null;
+    
+    if (updateUrl) {
+      updateUrlWithPath(path, false);
     }
+    
+    // Try to update meta tags based on directory
+    if (path) {
+      const dirName = path.split('/').pop();
+      try {
+        const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
+        const response = await fetch(apiUrl);
+        if (response.ok) {
+          const contents = await response.json();
+          
+          // Look for an image file
+          const imageFile = contents.find(item => 
+            /\.(jpe?g|png|gif)$/i.test(item.name)
+          );
+          
+          // Look for a markdown file (to extract description)
+          const mdFile = contents.find(item => 
+            item.name.toLowerCase().endsWith('.md')
+          );
+          
+          let description = "Directory contents";
+          let imagePath = null;
+          
+          if (imageFile) {
+            imagePath = imageFile.download_url;
+          }
+          
+          // Update meta tags for the directory
+          updateMetaTags(dirName || "DVS", description, imagePath);
+        }
+      } catch (error) {
+        console.log("Error updating meta for directory:", error);
+      }
+    } else {
+      // Reset to default meta tags for home page
+      updateMetaTags(null, null, null);
+    }
+    
+    fetchRepoContents(path);
+  }
 
     // Handle browser back/forward buttons
     window.addEventListener('popstate', function() {
