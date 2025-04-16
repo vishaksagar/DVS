@@ -14,7 +14,7 @@ I'll start today with a quote from one of my favorite movie/book - V for Vendett
 
 The quote just sounds nice, if you've watched the movie, you'd agree that Hugo Weaving has done a brilliant job in its delivery. It's a brilliant aliteration with the letter V some of which I was new to when I first listened to it, I've probably rewatched the movie over 10 times since. I want to spend spend some time to share my understanding of it.
 
-Vaudevill is/was an artform performed with masks, for those using the 🎭 in chats, this is where they come from.  The speaker is trying to show that this is an act, a performance of sorts and laments about his life/state, he says he's been wearing these masks for so long that he is a veteran at it. The use of humble I think is an internal joke in context of being thrown into this world as both victim and villain without choice. 
+Vaudeville is/was an artform performed with masks, for those using the 🎭 in chats, this is where they come from.  The speaker is trying to show that this is an act, a performance of sorts and laments about his life/state, he says he's been wearing these masks for so long that he is a veteran at it. The use of humble I think is an internal joke in context of being thrown into this world as both victim and villain without choice. 
 
 Think of it like this, as you are living your day to day life, you are forced into situations personally, professionaly, socially, politically.. to take a stand where sometimes you're a villain and sometimes you're the victim with little or no choice. Do you cry or do you laugh at it? At a point you get tired of it too.
 
