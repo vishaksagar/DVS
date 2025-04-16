@@ -517,7 +517,7 @@
         const isMarkdown = filePath.toLowerCase().endsWith('.md');
         if (isMarkdown) {
           const fixedContent = fixRelativeImagePaths(content, filePath);
-          const renderedContent = marked.parse(fixedContent);
+          const renderedContent = marked.parse(decodedContent);
           html += `<div class="markdown-body">${renderedContent}</div>`;
         } else {
           html += `<pre><code>${escapeHtml(content)}</code></pre>`;
