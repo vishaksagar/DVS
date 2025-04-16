@@ -230,6 +230,8 @@
     let currentPath = '';
     let currentFile = null;
     let isViewingFile = false;
+    // Add request cancellation token
+    let currentRequestController = null;
 
     // Add this function to update meta tags based on current content
     function updateMetaTags(title, description, imagePath) {
@@ -242,15 +244,6 @@
       document.querySelector('meta[property="og:title"]').setAttribute('content', title || defaultTitle);
       document.querySelector('meta[property="og:description"]').setAttribute('content', description || defaultDesc);
       document.querySelector('meta[property="og:image"]').setAttribute('content', imagePath || defaultImage);
-      
-      // // Update Twitter card meta tags too if they exist
-      // const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-      // const twitterDesc = document.querySelector('meta[name="twitter:description"]');
-      // const twitterImage = document.querySelector('meta[name="twitter:image"]');
-      
-      // if (twitterTitle) twitterTitle.setAttribute('content', title || defaultTitle);
-      // if (twitterDesc) twitterDesc.setAttribute('content', description || defaultDesc);
-      // if (twitterImage) twitterImage.setAttribute('content', imagePath || defaultImage);
       
       // Also update the page title
       document.title = title || defaultTitle;
@@ -287,20 +280,27 @@
       window.history.pushState(null, '', hash);
     }
 
-    function parseUrlForPath() {
+    // Modified to be async
+    async function parseUrlForPath() {
       const hash = window.location.hash;
-      if (hash.startsWith('#file=')) {
-        const filePath = decodeURIComponent(hash.substring(6));
-        viewFile(filePath);
-        return;
+      try {
+        if (hash.startsWith('#file=')) {
+          const filePath = decodeURIComponent(hash.substring(6));
+          await viewFile(filePath);
+          return;
+        }
+        if (hash.startsWith('#path=')) {
+          const path = decodeURIComponent(hash.substring(6));
+          await navigateTo(path, false);
+          return;
+        }
+        // Default to root if no hash
+        await navigateTo('', false);
+      } catch (error) {
+        console.error("Error parsing URL path:", error);
+        document.getElementById('file-contents').innerHTML = 
+          `<div class="error">Error loading content: ${error.message}</div>`;
       }
-      if (hash.startsWith('#path=')) {
-        const path = decodeURIComponent(hash.substring(6));
-        navigateTo(path, false);
-        return;
-      }
-      // Default to root if no hash
-      navigateTo('', false);
     }
 
     function updateBreadcrumb(path) {
@@ -319,22 +319,35 @@
     }
 
     async function fetchRepoContents(path = '') {
+      // Cancel any ongoing requests
+      if (currentRequestController) {
+        currentRequestController.abort();
+      }
+      
+      // Create a new AbortController for this request
+      currentRequestController = new AbortController();
+      const signal = currentRequestController.signal;
+      
       const fileContents = document.getElementById('file-contents');
       fileContents.innerHTML = '<div class="loading">Loading...</div>';
       
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
       try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, { signal });
         if (response.ok) {
           const contents = await response.json();
           displayContents(contents, path);
           fileContents.innerHTML = '';
           updateBreadcrumb(path);
         } else {
-          throw new Error('Failed to fetch contents');
+          throw new Error(`Failed to fetch contents: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
-        document.getElementById('file-list').innerHTML = '<li class="error">Error fetching contents.</li>';
+        if (error.name === 'AbortError') {
+          console.log('Fetch aborted due to new request');
+          return;
+        }
+        document.getElementById('file-list').innerHTML = `<li class="error">Error fetching contents: ${error.message}</li>`;
         fileContents.innerHTML = '';
       }
     }
@@ -347,6 +360,7 @@
         const parentPath = path.substring(0, path.lastIndexOf('/'));
         fileList.innerHTML += `<li><a href="#" onclick="navigateTo('${parentPath}'); return false;">..</a></li>`;
       }
+      
       // Sort contents: directories first, then files
       contents.sort((a, b) => {
         if (a.type !== b.type) {
@@ -354,6 +368,7 @@
         }
         return a.name.localeCompare(b.name);
       });
+      
       contents.forEach(item => {
         const listItem = document.createElement('li');
         if (item.type === 'dir') {
@@ -366,6 +381,15 @@
     }
 
     async function viewFile(filePath) {
+      // Cancel any ongoing requests
+      if (currentRequestController) {
+        currentRequestController.abort();
+      }
+      
+      // Create a new AbortController for this request
+      currentRequestController = new AbortController();
+      const signal = currentRequestController.signal;
+      
       isViewingFile = true;
       currentFile = filePath;
       updateUrlWithPath(filePath, true);
@@ -374,46 +398,66 @@
       fileContents.innerHTML = '<div class="loading">Loading file contents...</div>';
       
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}?ref=${branch}`;
+      
       try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, { signal });
         if (response.ok) {
           const fileData = await response.json();
           const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
           const fileTitle = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
           
-          // Check if there are images in the same directory
+          // Find the directory path
           const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
           let imagePath = null;
+          let description = "";
           
-          // Try to find an image in the same directory
+          // Get directory metadata in a separate try/catch block to avoid failing the whole file load
           try {
+            // Only fetch directory info if we don't already have it cached
             const dirApiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${dirPath}?ref=${branch}`;
-            const dirResponse = await fetch(dirApiUrl);
+            const dirResponse = await fetch(dirApiUrl, { signal });
+            
             if (dirResponse.ok) {
               const dirContents = await dirResponse.json();
-              // Look for image files
-              const imageFile = dirContents.find(item => 
-                /\.(jpe?g|png|gif)$/i.test(item.name)
-              );
+              
+              // Scan directory once for both image and markdown file in one pass
+              let imageFile = null;
+              let mdFile = null;
+              
+              for (const item of dirContents) {
+                // Check for image file
+                if (!imageFile && /\.(jpe?g|png|gif)$/i.test(item.name)) {
+                  imageFile = item;
+                }
+                
+                // Check for markdown file (potentially for description)
+                if (!mdFile && item.name.toLowerCase().endsWith('.md')) {
+                  mdFile = item;
+                }
+                
+                // If we found both, we can stop scanning
+                if (imageFile && mdFile) break;
+              }
+              
               if (imageFile) {
                 imagePath = imageFile.download_url;
               }
+              
+              // For markdown files, try to extract first paragraph for description
+              if (filePath.toLowerCase().endsWith('.md') && fileData.content) {
+                const decodedContent = atob(fileData.content.replace(/\n/g, ''));
+                const firstParagraph = decodedContent.match(/[^\r\n]+/);
+                if (firstParagraph && firstParagraph[0]) {
+                  description = firstParagraph[0].substring(0, 160); // Limit description length
+                }
+              }
             }
-          } catch (error) {
-            console.log("Error fetching directory contents:", error);
+          } catch (dirError) {
+            console.log("Error fetching directory contents:", dirError);
+            // Continue with file display even if directory metadata fails
           }
           
           // Update meta tags with file info
-          let description = ""; 
-          // For markdown files, try to extract first paragraph for description
-          if (filePath.toLowerCase().endsWith('.md') && fileData.content) {
-            const decodedContent = atob(fileData.content.replace(/\n/g, ''));
-            const firstParagraph = decodedContent.match(/[^\r\n]+/);
-            if (firstParagraph && firstParagraph[0]) {
-              description = firstParagraph[0].substring(0, 160); // Limit description length
-            }
-          }
-          
           updateMetaTags(fileTitle, description, imagePath);
           
           const isPdf = filePath.toLowerCase().endsWith('.pdf');
@@ -421,42 +465,64 @@
           if (isPdf) {
             // For PDFs, always fetch the raw content using download_url
             if (fileData.download_url) {
-              const pdfResponse = await fetch(fileData.download_url);
-              if (!pdfResponse.ok) throw new Error('Failed to fetch PDF content');
-              
-              // Create a blob with proper MIME type
-              const pdfBlob = await pdfResponse.blob();
-              const properPdfBlob = new Blob([pdfBlob], { type: 'application/pdf' });
-              const pdfUrl = URL.createObjectURL(properPdfBlob);
-              
-              // For Android, we'll use Google Docs viewer
-              const isAndroid = /Android/i.test(navigator.userAgent);
-              if (isAndroid) {
-                const googleDocsUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileData.download_url)}`;
-                displayFileContents(filePath, googleDocsUrl, true, 'android');
-              } else {
-                displayFileContents(filePath, pdfUrl, true, 'desktop');
+              try {
+                const pdfResponse = await fetch(fileData.download_url, { signal });
+                if (!pdfResponse.ok) throw new Error(`Failed to fetch PDF content: ${pdfResponse.status}`);
+                
+                // Create a blob with proper MIME type
+                const pdfBlob = await pdfResponse.blob();
+                const properPdfBlob = new Blob([pdfBlob], { type: 'application/pdf' });
+                const pdfUrl = URL.createObjectURL(properPdfBlob);
+                
+                // For Android, we'll use Google Docs viewer
+                const isAndroid = /Android/i.test(navigator.userAgent);
+                if (isAndroid) {
+                  const googleDocsUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileData.download_url)}`;
+                  displayFileContents(filePath, googleDocsUrl, true, 'android');
+                } else {
+                  displayFileContents(filePath, pdfUrl, true, 'desktop');
+                }
+              } catch (pdfError) {
+                if (pdfError.name === 'AbortError') {
+                  console.log('PDF fetch aborted due to new request');
+                  return;
+                }
+                throw new Error(`PDF loading error: ${pdfError.message}`);
               }
             } else {
               throw new Error('PDF download URL not available');
             }
           } else {
-            // Handle other file types as before
+            // Handle other file types
             if (fileData.content) {
               const decodedContent = atob(fileData.content.replace(/\n/g, ''));
               displayFileContents(filePath, decodedContent, false);
             } else if (fileData.download_url) {
-              const textResponse = await fetch(fileData.download_url);
-              const textContent = await textResponse.text();
-              displayFileContents(filePath, textContent, false);
+              try {
+                const textResponse = await fetch(fileData.download_url, { signal });
+                if (!textResponse.ok) throw new Error(`Failed to fetch text content: ${textResponse.status}`);
+                
+                const textContent = await textResponse.text();
+                displayFileContents(filePath, textContent, false);
+              } catch (textError) {
+                if (textError.name === 'AbortError') {
+                  console.log('Text fetch aborted due to new request');
+                  return;
+                }
+                throw new Error(`Text loading error: ${textError.message}`);
+              }
             } else {
               throw new Error('No content available');
             }
           }
         } else {
-          throw new Error('Failed to load file');
+          throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('File view aborted due to new request');
+          return;
+        }
         fileContents.innerHTML = `<div class="error">Error loading file contents: ${error.message}</div>`;
       }
     }
@@ -538,61 +604,105 @@
     }
 
     async function navigateTo(path, updateUrl = true) {
-    currentPath = path;
-    isViewingFile = false;
-    currentFile = null;
-    
-    if (updateUrl) {
-      updateUrlWithPath(path, false);
-    }
-    
-    // Try to update meta tags based on directory
-    if (path) {
-      const dirName = path.split('/').pop();
-      try {
-        const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
-        const response = await fetch(apiUrl);
-        if (response.ok) {
-          const contents = await response.json();
-          
-          // Look for an image file
-          const imageFile = contents.find(item => 
-            /\.(jpe?g|png|gif)$/i.test(item.name)
-          );
-          
-          // Look for a markdown file (to extract description)
-          const mdFile = contents.find(item => 
-            item.name.toLowerCase().endsWith('.md')
-          );
-          
-          let description = "Directory contents";
-          let imagePath = null;
-          
-          if (imageFile) {
-            imagePath = imageFile.download_url;
-          }
-          
-          // Update meta tags for the directory
-          updateMetaTags(dirName || "DVS", description, imagePath);
-        }
-      } catch (error) {
-        console.log("Error updating meta for directory:", error);
+      // Cancel any ongoing requests
+      if (currentRequestController) {
+        currentRequestController.abort();
       }
-    } else {
-      // Reset to default meta tags for home page
-      updateMetaTags(null, null, null);
+      
+      // Create a new AbortController for this request
+      currentRequestController = new AbortController();
+      const signal = currentRequestController.signal;
+      
+      currentPath = path;
+      isViewingFile = false;
+      currentFile = null;
+      
+      if (updateUrl) {
+        updateUrlWithPath(path, false);
+      }
+      
+      try {
+        // Try to update meta tags based on directory
+        if (path) {
+          const dirName = path.split('/').pop() || "DVS";
+          const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
+          
+          const response = await fetch(apiUrl, { signal });
+          if (response.ok) {
+            const contents = await response.json();
+            
+            // Scan directory contents once for both image and readme files
+            let imageFile = null;
+            let readmeFile = null;
+            
+            for (const item of contents) {
+              // Check for image files
+              if (!imageFile && /\.(jpe?g|png|gif)$/i.test(item.name)) {
+                imageFile = item;
+              }
+              
+              // Look specifically for README.md to use for description
+              if (!readmeFile && item.name.toLowerCase() === 'readme.md') {
+                readmeFile = item;
+              }
+              
+              // If we found both, stop scanning
+              if (imageFile && readmeFile) break;
+            }
+            
+            let description = "Directory contents";
+            let imagePath = null;
+            
+            if (imageFile) {
+              imagePath = imageFile.download_url;
+            }
+            
+            // Try to get description from README.md if present
+            if (readmeFile) {
+              try {
+                const readmeResponse = await fetch(readmeFile.download_url, { signal });
+                if (readmeResponse.ok) {
+                  const readmeText = await readmeResponse.text();
+                  const firstParagraph = readmeText.match(/[^\r\n]+/);
+                  if (firstParagraph && firstParagraph[0]) {
+                    description = firstParagraph[0].substring(0, 160);
+                  }
+                }
+              } catch (readmeError) {
+                console.log("Error fetching README:", readmeError);
+              }
+            }
+            
+            // Update meta tags for the directory
+            updateMetaTags(dirName, description, imagePath);
+          }
+        } else {
+          // Reset to default meta tags for home page
+          updateMetaTags(null, null, null);
+        }
+        
+        // Now fetch and display the directory contents
+        await fetchRepoContents(path);
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('Navigation aborted due to new request');
+          return;
+        }
+        console.error("Error navigating to path:", error);
+        document.getElementById('file-contents').innerHTML = 
+          `<div class="error">Error loading directory: ${error.message}</div>`;
+      }
     }
-    
-    await fetchRepoContents(path);
-  }
 
     // Handle browser back/forward buttons
-    window.addEventListener('popstate', function() {
-      parseUrlForPath();
+    window.addEventListener('popstate', async function() {
+      await parseUrlForPath();
     });
 
     // Initial load - parse URL for path or file
-    parseUrlForPath();
+    document.addEventListener('DOMContentLoaded', async function() {
+      await parseUrlForPath();
+    });
   </script>
 </body>
 </html>
