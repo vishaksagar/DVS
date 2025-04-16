@@ -1,8 +1,8 @@
-[Ustad Sultan Khan], Ustad Zakir Hussain - [Raag Charukeshi](https://www.youtube.com/watch?v=yAEkb2cMDG4&t=1s) (Link redirects to Youtube to play song)  
+Today we'll listen to 3 pieces of music and try to grope in the dark a bit.
+
+Ustad Sultan Khan, Ustad Zakir Hussain - [Raag Charukeshi](https://www.youtube.com/watch?v=yAEkb2cMDG4&t=1s) (Link redirects to Youtube to play song)  
 TOOL - [Chocolate Chip Trip ](https://www.youtube.com/watch?v=POdNTtDi-eA)  
 Veena Doreswamy Iyengar - [Raag Darbari Kanada Thillana](https://youtu.be/7XwnH5k4PBM?si=9LPeyMvQReI3ock-)
-
-Today we'll listen to 3 pieces of music and try to grope in the dark a bit.
 
 A photo taken during my early morning walk as I listened to some of these.
 ![Sarakki lake](./IMG_20250416_064414999.jpg)
