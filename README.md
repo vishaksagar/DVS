@@ -39,4 +39,4 @@ My pen name for writing poetry is **DVS** [Wordpress](https://dvsvishak.wordpres
 - Digitally Verified Shooter (A friend said this after I shared these posts with him)
 P.S. The wordpress site is a bit dated. I haven't updated it in a while.
 Here's something I wrote recently.  
-![Who is a fool?](./poem_latest.jpeg)
+![Who is a fool?](./poem_latest.jpg)
