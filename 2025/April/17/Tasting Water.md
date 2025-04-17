@@ -12,7 +12,7 @@ Water bottle
 
 ##
 
-What are we doing when we consume things? How are these things related? I believe that, **you are what you consume.**  
+What do we do as we consume things? How are these things related? I believe that, **You are what You consume.**  
 ## 
 A perspective on this, is, How much time was spent by the entities as themselves before they reached you finally for consumption. In other words when was it ready? Or when is a good day to claim as such?  
 Typically a **soft drink** takes around 5 mins to prepare in a factory at scale.  
@@ -25,7 +25,7 @@ Typically a **soft drink** takes around 5 mins to prepare in a factory at scale.
 As mortals we have a beginning and an end, we call the time in between life.
 You could use the same definition for what we consume or interact with also. Technically we are all as old as [Big Bang](https://en.wikipedia.org/wiki/Big_Bang) (~13.7 billion years). Typically a human lives to [75 years](https://en.wikipedia.org/wiki/Life_expectancy).  
 
-This here vis-a-vis is my issue regarding the loss of language or inability to have a conversation, which I mention in the intro (https://vishaksagar.github.io/DVS/#file=README.md) as **some of my observations on life, are beyond what I can share with those whom I know.**
+This here vis-a-vis is my issue regarding the loss of language or inability to have a conversation, which I mention in the [intro](https://vishaksagar.github.io/DVS/#file=README.md) as **some of my observations on life, are beyond what I can share with those whom I know.**
 
 ##
 Another perspective is how we navigate exchanging the experience of taste.  
