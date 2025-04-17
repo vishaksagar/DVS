@@ -10,6 +10,7 @@
   <meta property="og:type" content="website" />
   <title>DVS</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.2.12/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
   <style>
     /* Catppuccin Mocha Colors */
@@ -286,7 +287,20 @@
       breaks: true,
       gfm: true,
       headerIds: true,
-      mangle: false
+      mangle: false,
+      renderer: (function() {
+        const renderer = new marked.Renderer();
+        const originalParagraph = renderer.paragraph;
+        const emoji = new EmojiConvertor();
+        emoji.replace_mode = 'unified';
+        emoji.allow_native = true;
+        
+        renderer.paragraph = function(text) {
+          return originalParagraph.call(this, emoji.replace_colons(text));
+        };
+        
+        return renderer;
+      })()
     });
 
     // URL handling functions
