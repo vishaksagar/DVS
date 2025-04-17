@@ -31,5 +31,4 @@ A solution I finally arrived at, that gets done in 3 lines of code. Took me half
 Hint: Plumbing
 
 Ciao.
-
 -The Silent Librarian
