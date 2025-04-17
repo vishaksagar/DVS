@@ -2,10 +2,10 @@
 
 I choose the pen name The Silent Librarian for the hobby I have taken up as of Apr 14 2025.  
 It so happens that I'm at a point in life where I find that, some of my observations on life, are beyond what I can share with those whom I know.   
-So I plan to use this space as a medium to have that dialogue, albeit internal, posted externally.
-[Click to start reading](2025/April/14)
+So I plan to use this space as a medium to have that dialogue, albeit internal, posted externally.  
+[Click to start reading](https://vishaksagar.github.io/DVS/#path=2025%2FApril%2F14)
 
-## Names I go/have gone by
+### Names I go/have gone by
 **Vishak Sagar** (given by parents)
 The name Vishak (also sometimes spelled Vishakh or Visakh) has its roots in Sanskrit and is used in India. Here's a breakdown of the meaning:
 
