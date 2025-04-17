@@ -10,7 +10,7 @@ The first piece, by [Sultan Khan](https://en.wikipedia.org/wiki/Sultan_Khan_(mus
 
 You now take this Sarangi and the raag and put it in the hands of Ustads, not 1 but 2 of them, that, there is magic. Accompanying him is Ustad - [Zakir Hussain](https://en.wikipedia.org/wiki/Zakir_Hussain_(musician)), someone I think who doesn't need an introduction.  (from what I'm aware Ustad is a bestowed title, something not earned through training)
 
-The second piece, by [TOOL](https://en.wikipedia.org/wiki/Tool_(band)) a band known for a genre of music called Progressive Rock/Metal (Prog-Rock) Usually the beats in western music is simple, this band is one of those that plays in polyrythmic tune. Check some of the videos by [Rich Beato](https://www.youtube.com/results?search_query=rick+beato+tool) to get some initiation about them. 
+The second piece, by [TOOL](https://en.wikipedia.org/wiki/Tool_(band)) a band known for a genre of music called Progressive Rock/Metal (Prog-Rock) Usually the beats in western music is simple, this band is one of those that plays in polyrythmic tune. Check some of the videos by [Rick Beato](https://www.youtube.com/results?search_query=rick+beato+tool) to get some initiation about them. 
 
 The third piece, by [Veena Doreswamy Iyengar](https://en.wikipedia.org/wiki/Doreswamy_Iyengar) is an evening raga called Darbari Kanada known for its majesty.
 
