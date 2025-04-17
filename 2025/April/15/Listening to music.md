@@ -12,6 +12,7 @@ I also carry a backup earphones (**Nothing Ear 1**) just in case, FYI this model
 For my bedroom I have a **iBall Booster 5.1 Bluetooth Speaker** This is an ancient relic, I think the company went bust, but from what I know, even if I sell it today, there are buyers who'll buy it for more than what I paid. Setting it up in the limited space I have with the best configuration required an old TV with an Optic Cable out, a simple Digital to Analogue coverter (DAC), and a smart TV connector like Roku or Amazon Firestick, to enable Spotify. Someday I do want to have a proper setup for listening to music, but for now this is my current rig.  
 
 Last year according to Spotify I've listened to 24,443 minutes of music, i.e. an average of at least an hour daily. 
+
 ![2024 Spotify wrapped](./Screenshot_20250415-225203.png)
 
 I have had the habit of listening to music since I was a kid, have a hobby of collecting music and making playlists. Sharing link to it, for those interested.
