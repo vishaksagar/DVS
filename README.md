@@ -33,8 +33,8 @@ During school it was like shaki or whiskey
 Wife and family have kept nicknames but those are secret😅
 
 My pen name for writing poetry is **DVS** [Wordpress](https://dvsvishak.wordpress.com/). The blank piece of paper with an infinity pencil is taken from it. Multiple people asked what does DVS mean? So here's what it has been, so far
-##
-DVS sounds like **devious/devilish**   
+
+**DVS** sounds like **devious/devilish**   
 **D** is a dream  
 I do want to have a **PhD/DSc** tag with my name someday
 [One Piece](https://en.wikipedia.org/wiki/One_Piece) manga/anime has a thing called **Will of D.** which is a secret kept from the readers since it's inception 20+ years ago, and FYI it's ongoing with over 1000 chapters and episodes  
