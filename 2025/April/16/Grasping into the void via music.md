@@ -18,7 +18,7 @@ The third piece, by [Veena Doreswamy Iyengar](https://en.wikipedia.org/wiki/Dore
 
 Listen to this [talk](https://www.youtube.com/watch?v=VYere8DxGbc) by Zakir Hussain, it's unclear to me whether he was even talking to  Tabla players in this.
 
--DVS  
+-The Silent Librarian
 
 P.S. I had a question in mind as I took my morning walk.   
 If I were a fish in the lake surrounded by birds, suffocating slowly as the summer heat rose. Which of these three pieces would I relate to?
