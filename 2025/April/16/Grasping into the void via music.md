@@ -4,7 +4,7 @@ Ustad Sultan Khan, Ustad Zakir Hussain - [Raag Charukeshi](https://www.youtube.c
 TOOL - [Chocolate Chip Trip ](https://www.youtube.com/watch?v=POdNTtDi-eA)  
 Veena Doreswamy Iyengar - [Raag Darbari Kanada Thillana](https://youtu.be/7XwnH5k4PBM?si=9LPeyMvQReI3ock-)
 
-A photo taken during my early morning walk as I listened to some of these.
+A photo taken during my early morning walk as I listened to some of these.  
 ![Sarakki lake](./IMG_20250416_064414999.jpg)
 The first piece, by [Sultan Khan](https://en.wikipedia.org/wiki/Sultan_Khan_(musician)), is played on an instrument called [Sarangi](https://en.wikipedia.org/wiki/Sarangi). One of my favorite musical instruments, it is a rare, old and delicate one at that. I think it was like a great grandfather to modern day violin, travelling in the sands of the East, with a much deeper voice. Raag Charukeshi, another one of the those gems, I don't have words for the one who imagined it.  
 
