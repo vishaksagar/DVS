@@ -24,7 +24,7 @@ I was known to have always been seen wandering with earphones plugged in during 
     This is a habit, and for those passionate to pick one, a word of advice, take care of your body first, quality over quantity.
 
 
-P.S. I had recently shared a problem with my mentees and others at office. Give it shot if it interests you.  
+P.S. I had recently shared a problem with my mentees and others at office. Give it a shot if it interests you.  
 You listened to some new song and are very interested to share it with your neighbour sitting beside you. You want to listen to it alongside them and you don't want to pay for some service/device that provides such a feature like Spotify or disturb those sitting around you by using a speaker. What do you do? What are the drawbacks/limitations with your approach?
 
 A solution I finally arrived at, that gets done in 3 lines of code. Took me half a day to get there, but I had some ideas from tinkering with audio and laptops since a long time to help.
