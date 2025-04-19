@@ -44,5 +44,5 @@ P.S. The wordpress site is a bit dated. I haven't updated it in a while.
 Here's something I wrote recently.  
 ![Who is a fool?](./poem_latest.jpg)
 
-P.P.S.
+P.P.S.  
 #Maintain silence in the library!
