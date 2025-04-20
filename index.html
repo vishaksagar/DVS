@@ -1,626 +1,686 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta property="og:title" content="The Silent Librarian" />
-  <meta property="og:description" content="A journal, a blog, a voice of sorts, the world as I see it and my ruminations on it." />
-  <meta property="og:image" content="https://raw.githubusercontent.com/vishaksagar/DVS/main/assets/blank_piece_of_paper.jpg" />  
-  <meta property="og:url" content="https://vishaksagar.github.io/DVS/" />
-  <meta property="og:type" content="website" />
-  <title>DVS</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.2.12/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
-  <style>
-    /* Catppuccin Mocha Colors */
-    :root {
-      /* Light theme */
-      --bg-color: #ffffff;
-      --text-color: #24292e;
-      --border-color: #e1e4e8;
-      --header-bg: #f6f8fa;
-      --link-color: #0366d6;
-      --pre-bg: #f4f4f4;
-    }
-    [data-theme="dark"] {
-      /* Catppuccin Mocha palette */
-      --bg-color: #1e1e2e;        /* Base */
-      --surface0: #313244;        /* Surface0 */
-      --surface1: #45475a;        /* Surface1 */
-      --surface2: #585b70;        /* Surface2 */
-      --text-color: #cdd6f4;      /* Text */
-      --subtext0: #a6adc8;        /* Subtext0 */
-      --border-color: #313244;    /* Surface0 */
-      --header-bg: #181825;       /* Mantle */
-      --link-color: #89b4fa;      /* Blue */
-      --pre-bg: #11111b;          /* Crust */
-      --accent: #cba6f7;          /* Mauve */
-      --green: #a6e3a1;           /* Green */
-      --red: #f38ba8;             /* Red */
-      --yellow: #f9e2af;          /* Yellow */
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      padding: 20px;
-      margin: 0;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s ease;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 15px;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .theme-toggle {
-      background: var(--surface0);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s ease;
-    }
-    [data-theme="dark"] .theme-toggle:hover {
-      background: var(--surface1);
-      border-color: var(--accent);
-    }
-    ul {
-      list-style-type: none;
-      padding: 0;
-      background: var(--bg-color);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      margin: 0;
-    }
-    li {
-      margin: 0;
-      border-bottom: 1px solid var(--border-color);
-    }
-    li:last-child {
-      border-bottom: none;
-    }
-    li a {
-      padding: 8px 16px;
-      display: block;
-      color: var(--link-color);
-      text-decoration: none;
-    }
-    [data-theme="dark"] li a:hover {
-      background: var(--surface0);
-    }
-    pre {
-      background: var(--pre-bg);
-      padding: 16px;
-      border-radius: 6px;
-      overflow: auto;
-      border: 1px solid var(--border-color);
-      margin: 0;
-      color: var(--text-color);
-    }
-    #file-contents {
-      margin-top: 20px;
-    }
-    .markdown-body {
-      box-sizing: border-box;
-      min-width: 200px;
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 20px;
-      border: 1px solid var(--border-color);
-      border-radius: 0 0 6px 6px;
-      background-color: var(--bg-color) !important;
-      color: var(--text-color) !important;
-    }
-    .file-header {
-      padding: 16px;
-      background: var(--header-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px 6px 0 0;
-      margin-bottom: -1px;
-      font-family: monospace;
-      font-size: 14px;
-      color: var(--subtext0);
-    }
-    /* Dark theme overrides for markdown content */
-    [data-theme="dark"] .markdown-body {
-      color-scheme: dark;
-    }
-    [data-theme="dark"] .markdown-body a {
-      color: var(--link-color);
-    }
-    [data-theme="dark"] .markdown-body hr {
-      border-color: var(--border-color);
-    }
-    [data-theme="dark"] .markdown-body blockquote {
-      color: var(--subtext0);
-      border-left-color: var(--surface1);
-      background: var(--surface0);
-    }
-    [data-theme="dark"] .markdown-body h1,
-    [data-theme="dark"] .markdown-body h2,
-    [data-theme="dark"] .markdown-body h3,
-    [data-theme="dark"] .markdown-body h4,
-    [data-theme="dark"] .markdown-body h5,
-    [data-theme="dark"] .markdown-body h6 {
-      color: var(--accent);
-      border-bottom-color: var(--border-color);
-    }
-    [data-theme="dark"] .markdown-body code {
-      background: var(--pre-bg);
-      color: var(--green);
-    }
-    .breadcrumb {
-      margin-bottom: 15px;
-      padding: 8px 16px;
-      background: var(--header-bg);
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    [data-theme="dark"] .breadcrumb a {
-      color: var(--link-color);
-    }
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: var(--text-color);
-    }
-    /* PDF viewer styles */
-    .pdf-container {
-      width: 100%;
-      height: 800px;
-      border: 1px solid var(--border-color);
-      border-radius: 0 0 6px 6px;
-    }
-    .pdf-viewer {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    /* Mobile Responsiveness */
-    @media (max-width: 768px) {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="The Silent Librarian" />
+    <meta
+      property="og:description"
+      content="A journal, a blog, a voice of sorts, the world as I see it and my ruminations on it."
+    />
+    <meta
+      property="og:image"
+      content="https://raw.githubusercontent.com/vishaksagar/DVS/main/assets/blank_piece_of_paper.jpg"
+    />
+    <meta property="og:url" content="https://vishaksagar.github.io/DVS/" />
+    <meta property="og:type" content="website" />
+    <title>DVS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.2.12/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css"
+    />
+    <style>
+      /* Catppuccin Mocha Colors */
+      :root {
+        /* Light theme */
+        --bg-color: #ffffff;
+        --text-color: #24292e;
+        --border-color: #e1e4e8;
+        --header-bg: #f6f8fa;
+        --link-color: #0366d6;
+        --pre-bg: #f4f4f4;
+      }
+      [data-theme="dark"] {
+        /* Catppuccin Mocha palette */
+        --bg-color: #1e1e2e; /* Base */
+        --surface0: #313244; /* Surface0 */
+        --surface1: #45475a; /* Surface1 */
+        --surface2: #585b70; /* Surface2 */
+        --text-color: #cdd6f4; /* Text */
+        --subtext0: #a6adc8; /* Subtext0 */
+        --border-color: #313244; /* Surface0 */
+        --header-bg: #181825; /* Mantle */
+        --link-color: #89b4fa; /* Blue */
+        --pre-bg: #11111b; /* Crust */
+        --accent: #cba6f7; /* Mauve */
+        --green: #a6e3a1; /* Green */
+        --red: #f38ba8; /* Red */
+        --yellow: #f9e2af; /* Yellow */
+      }
       body {
-        padding: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+          Arial, sans-serif;
+        padding: 20px;
+        margin: 0;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s ease;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
       }
       .header {
-        flex-direction: column;
-        align-items: flex-start;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
       }
-      .markdown-body {
-        padding: 15px;
+      .theme-toggle {
+        background: var(--surface0);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+      }
+      [data-theme="dark"] .theme-toggle:hover {
+        background: var(--surface1);
+        border-color: var(--accent);
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        margin: 0;
+      }
+      li {
+        margin: 0;
+        border-bottom: 1px solid var(--border-color);
+      }
+      li:last-child {
+        border-bottom: none;
+      }
+      li a {
+        padding: 8px 16px;
+        display: block;
+        color: var(--link-color);
+        text-decoration: none;
+      }
+      [data-theme="dark"] li a:hover {
+        background: var(--surface0);
       }
       pre {
-        max-width: 100%;
-        font-size: 14px;
+        background: var(--pre-bg);
+        padding: 16px;
+        border-radius: 6px;
+        overflow: auto;
+        border: 1px solid var(--border-color);
+        margin: 0;
+        color: var(--text-color);
+      }
+      #file-contents {
+        margin-top: 20px;
+      }
+      .markdown-body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        border-radius: 0 0 6px 6px;
+        background-color: var(--bg-color) !important;
+        color: var(--text-color) !important;
       }
       .file-header {
-        font-size: 12px;
+        padding: 16px;
+        background: var(--header-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px 6px 0 0;
+        margin-bottom: -1px;
+        font-family: monospace;
+        font-size: 14px;
+        color: var(--subtext0);
       }
+      /* Dark theme overrides for markdown content */
+      [data-theme="dark"] .markdown-body {
+        color-scheme: dark;
+      }
+      [data-theme="dark"] .markdown-body a {
+        color: var(--link-color);
+      }
+      [data-theme="dark"] .markdown-body hr {
+        border-color: var(--border-color);
+      }
+      [data-theme="dark"] .markdown-body blockquote {
+        color: var(--subtext0);
+        border-left-color: var(--surface1);
+        background: var(--surface0);
+      }
+      [data-theme="dark"] .markdown-body h1,
+      [data-theme="dark"] .markdown-body h2,
+      [data-theme="dark"] .markdown-body h3,
+      [data-theme="dark"] .markdown-body h4,
+      [data-theme="dark"] .markdown-body h5,
+      [data-theme="dark"] .markdown-body h6 {
+        color: var(--accent);
+        border-bottom-color: var(--border-color);
+      }
+      [data-theme="dark"] .markdown-body code {
+        background: var(--pre-bg);
+        color: var(--green);
+      }
+      .breadcrumb {
+        margin-bottom: 15px;
+        padding: 8px 16px;
+        background: var(--header-bg);
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      [data-theme="dark"] .breadcrumb a {
+        color: var(--link-color);
+      }
+      .loading {
+        text-align: center;
+        padding: 20px;
+        color: var(--text-color);
+      }
+      /* PDF viewer styles */
       .pdf-container {
-        height: 500px;
+        width: 100%;
+        height: 800px;
+        border: 1px solid var(--border-color);
+        border-radius: 0 0 6px 6px;
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
-      <button class="theme-toggle" onclick="document.getElementById('contactModal').style.display='block'">Contact Me</button>
+      .pdf-viewer {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .markdown-body {
+          padding: 15px;
+        }
+        pre {
+          max-width: 100%;
+          font-size: 14px;
+        }
+        .file-header {
+          font-size: 12px;
+        }
+        .pdf-container {
+          height: 500px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          Toggle Theme
+        </button>
+        <button
+          class="theme-toggle"
+          onclick="window.location.href='contact.html'"
+        >
+          Contact Me
+        </button>
+      </div>
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <ul id="file-list"></ul>
+      <div id="file-contents"></div>
     </div>
-    <div class="breadcrumb" id="breadcrumb"></div>
-    <ul id="file-list"></ul>
-    <div id="file-contents"></div>
-  </div>
-  <div id="contactModal" style="display:none; position:fixed; top:250px; left:250px; width:100%; height:100%; z-index:9999; justify-content:center; align-items:center;">
-    <div style="background:var(--bg-color); color:var(--text-color); padding:40px; border-radius:8px; width:90%; max-width:500px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
-      <h2>Contact Me</h2>
-      <form action="https://formsubmit.co/vishaksagar@gmail.com" method="POST" onsubmit="document.getElementById('contactModal').style.display='none';">
-        <label for="name">Name:</label><br>
-        <input type="text" name="name" required style="width:100%; padding:8px; margin-bottom:10px;"><br>
-        <label for="email">Email:</label><br>
-        <input type="email" name="email" required style="width:100%; padding:8px; margin-bottom:10px;"><br>
-        <label for="message">Message:</label><br>
-        <textarea name="message" rows="5" required style="width:100%; padding:8px; margin-bottom:10px;"></textarea><br>
-        <button type="submit" class="theme-toggle">Send</button>
-        <button type="button" class="theme-toggle" onclick="document.getElementById('contactModal').style.display='none'">Cancel</button>
-      </form>
-    </div>
-  </div>
-  <script>
-    const username = 'vishaksagar';
-    const repo = 'DVS';
-    const branch = 'main';
-    let currentPath = '';
-    let currentFile = null;
-    let isViewingFile = false;
-    // Add request cancellation token
-    let currentRequestController = null;
 
-    // Add this function to update meta tags based on current content
-    function updateMetaTags(title, description, imagePath) {
-      // Default values
-      const defaultTitle = "The Silent Librarian";
-      const defaultDesc = "A journal, a blog, a voice of sorts, the world as I see it and my ruminations on it.";
-      const defaultImage = "https://raw.githubusercontent.com/vishaksagar/DVS/main/assets/blank_piece_of_paper.jpg";
-      
-      // Set new values or use defaults
-      document.querySelector('meta[property="og:title"]').setAttribute('content', title || defaultTitle);
-      document.querySelector('meta[property="og:description"]').setAttribute('content', description || defaultDesc);
-      document.querySelector('meta[property="og:image"]').setAttribute('content', imagePath || defaultImage);
-      
-      // Also update the page title
-      document.title = title || defaultTitle;
-    }
+    <script>
+      const username = "vishaksagar";
+      const repo = "DVS";
+      const branch = "main";
+      let currentPath = "";
+      let currentFile = null;
+      let isViewingFile = false;
+      // Add request cancellation token
+      let currentRequestController = null;
 
-    function fixRelativeImagePaths(markdown, filePath) {
-      const basePath = filePath.substring(0, filePath.lastIndexOf('/'));
-      return markdown.replace(/!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g, (match, alt, relPath) => {
-        const fullPath = `${basePath}/${relPath}`.replace(/\/+/g, '/');
-        const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${fullPath}`;
-        return `![${alt}](${rawUrl})`;
-      });
-    }
+      // Add this function to update meta tags based on current content
+      function updateMetaTags(title, description, imagePath) {
+        // Default values
+        const defaultTitle = "The Silent Librarian";
+        const defaultDesc =
+          "A journal, a blog, a voice of sorts, the world as I see it and my ruminations on it.";
+        const defaultImage =
+          "https://raw.githubusercontent.com/vishaksagar/DVS/main/assets/blank_piece_of_paper.jpg";
 
-    function toggleTheme() {
-      const isDark = document.body.getAttribute('data-theme') === 'dark';
-      document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
-    }
+        // Set new values or use defaults
+        document
+          .querySelector('meta[property="og:title"]')
+          .setAttribute("content", title || defaultTitle);
+        document
+          .querySelector('meta[property="og:description"]')
+          .setAttribute("content", description || defaultDesc);
+        document
+          .querySelector('meta[property="og:image"]')
+          .setAttribute("content", imagePath || defaultImage);
 
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', savedTheme);
-
-    marked.setOptions({
-      breaks: true,
-      gfm: true,
-      headerIds: true,
-      mangle: false,
-      renderer: (function() {
-        const renderer = new marked.Renderer();
-        const originalParagraph = renderer.paragraph;
-        const emoji = new EmojiConvertor();
-        emoji.replace_mode = 'unified';
-        emoji.allow_native = true;
-        
-        renderer.paragraph = function(text) {
-          return originalParagraph.call(this, emoji.replace_colons(text));
-        };
-        
-        return renderer;
-      })()
-    });
-
-    // URL handling functions
-    function updateUrlWithPath(path, isFile = false) {
-      const hash = isFile ? `#file=${encodeURIComponent(path)}` : `#path=${encodeURIComponent(path)}`;
-      window.history.pushState(null, '', hash);
-    }
-
-    // Modified to be async
-    async function parseUrlForPath() {
-      const hash = window.location.hash;
-      try {
-        if (hash.startsWith('#file=')) {
-          const filePath = decodeURIComponent(hash.substring(6));
-          await viewFile(filePath);
-          return;
-        }
-        if (hash.startsWith('#path=')) {
-          const path = decodeURIComponent(hash.substring(6));
-          await navigateTo(path, false);
-          return;
-        }
-        // Default to root if no hash
-        await navigateTo('', false);
-      } catch (error) {
-        console.error("Error parsing URL path:", error);
-        document.getElementById('file-contents').innerHTML = 
-          `<div class="error">Error loading content: ${error.message}</div>`;
+        // Also update the page title
+        document.title = title || defaultTitle;
       }
-    }
 
-    function updateBreadcrumb(path) {
-      const parts = path ? path.split('/') : [];
-      const breadcrumb = document.getElementById('breadcrumb');
-      
-      let html = `<a href="#" data-path="" class="navigation-link">DVS</a>`;
-      let currentPath = '';
-      
-      parts.forEach((part, index) => {
-        currentPath += (index === 0 ? part : '/' + part);
-        html += ` / <a href="#" data-path="${currentPath}" class="navigation-link">${part}</a>`;
-      });
-      
-      breadcrumb.innerHTML = html;
-      
-      // Add event listeners to the newly created breadcrumb links
-      document.querySelectorAll('#breadcrumb .navigation-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const path = this.getAttribute('data-path');
-          navigateTo(path);
-        });
-      });
-    }
-
-    async function fetchRepoContents(path = '') {
-      // Cancel any ongoing requests
-      if (currentRequestController) {
-        currentRequestController.abort();
-      }
-      
-      // Create a new AbortController for this request
-      currentRequestController = new AbortController();
-      const signal = currentRequestController.signal;
-      
-      const fileContents = document.getElementById('file-contents');
-      fileContents.innerHTML = '<div class="loading">Loading...</div>';
-      
-      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
-      try {
-        const response = await fetch(apiUrl, { signal });
-        if (response.ok) {
-          const contents = await response.json();
-          displayContents(contents, path);
-          fileContents.innerHTML = '';
-          updateBreadcrumb(path);
-        } else {
-          throw new Error(`Failed to fetch contents: ${response.status} ${response.statusText}`);
-        }
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Fetch aborted due to new request');
-          return;
-        }
-        document.getElementById('file-list').innerHTML = `<li class="error">Error fetching contents: ${error.message}</li>`;
-        fileContents.innerHTML = '';
-      }
-    }
-
-    function displayContents(contents, path) {
-      const fileList = document.getElementById('file-list');
-      fileList.innerHTML = '';
-      
-      if (path !== '') {
-        const parentPath = path.substring(0, path.lastIndexOf('/'));
-        const parentItem = document.createElement('li');
-        const parentLink = document.createElement('a');
-        parentLink.href = '#';
-        parentLink.textContent = '..';
-        parentLink.setAttribute('data-path', parentPath);
-        parentLink.classList.add('navigation-link');
-        parentItem.appendChild(parentLink);
-        fileList.appendChild(parentItem);
-      }
-      
-      // Sort contents: directories first, then files
-      contents.sort((a, b) => {
-        if (a.type !== b.type) {
-          return a.type === 'dir' ? -1 : 1;
-        }
-        return a.name.localeCompare(b.name);
-      });
-
-      // Filter contents based on path and file type
-      const filteredContents = contents.filter(item => {
-        // Hide assets folder when in root directory
-        if (path === '' && item.type === 'dir' && item.name === 'assets') return false;
-
-        // Always show directories
-        if (item.type === 'dir') return true;
-        
-        // // Special case for assets folder - show no files
-        // if (path === 'assets') return false;
-        
-        // For other paths, only show .md files
-        return item.name.toLowerCase().endsWith('.md');
-      });
-      
-      filteredContents.forEach(item => {
-        const listItem = document.createElement('li');
-        const link = document.createElement('a');
-        link.href = '#';
-        
-        if (item.type === 'dir') {
-          link.textContent = `📁 ${item.name}/`;
-          link.setAttribute('data-path', item.path);
-          link.classList.add('navigation-link');
-        } else {
-          link.textContent = `📄 ${item.name}`;
-          link.setAttribute('data-file', item.path);
-          link.classList.add('file-link');
-        }
-        
-        listItem.appendChild(link);
-        fileList.appendChild(listItem);
-      });
-      
-      // Add event listeners to the newly created links
-      document.querySelectorAll('#file-list .navigation-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const path = this.getAttribute('data-path');
-          navigateTo(path);
-        });
-      });
-      
-      document.querySelectorAll('#file-list .file-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const filePath = this.getAttribute('data-file');
-          viewFile(filePath);
-        });
-      });
-    }
-
-    async function viewFile(filePath) {
-      // Cancel any ongoing requests
-      if (currentRequestController) {
-        currentRequestController.abort();
-      }
-      
-      // Create a new AbortController for this request
-      currentRequestController = new AbortController();
-      const signal = currentRequestController.signal;
-      
-      isViewingFile = true;
-      currentFile = filePath;
-      updateUrlWithPath(filePath, true);
-      
-      const fileContents = document.getElementById('file-contents');
-      fileContents.innerHTML = '<div class="loading">Loading file contents...</div>';
-      
-      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}?ref=${branch}`;
-      
-      try {
-        const response = await fetch(apiUrl, { signal });
-        if (response.ok) {
-          const fileData = await response.json();
-          const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-          const fileTitle = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
-          
-          // Find the directory path
-          const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
-          let imagePath = null;
-          let description = "";
-          
-          // Get directory metadata in a separate try/catch block to avoid failing the whole file load
-          try {
-            // Only fetch directory info if we don't already have it cached
-            const dirApiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${dirPath}?ref=${branch}`;
-            const dirResponse = await fetch(dirApiUrl, { signal });
-            
-            if (dirResponse.ok) {
-              const dirContents = await dirResponse.json();
-              
-              // Scan directory once for both image and markdown file in one pass
-              let imageFile = null;
-              let mdFile = null;
-              
-              for (const item of dirContents) {
-                // Check for image file
-                if (!imageFile && /\.(jpe?g|png|gif)$/i.test(item.name)) {
-                  imageFile = item;
-                }
-                
-                // Check for markdown file (potentially for description)
-                if (!mdFile && item.name.toLowerCase().endsWith('.md')) {
-                  mdFile = item;
-                }
-                
-                // If we found both, we can stop scanning
-                if (imageFile && mdFile) break;
-              }
-              
-              if (imageFile) {
-                imagePath = imageFile.download_url;
-              }
-              
-              // For markdown files, try to extract first paragraph for description
-              if (filePath.toLowerCase().endsWith('.md') && fileData.content) {
-                const decodedContent = atob(fileData.content.replace(/\n/g, ''));
-                const firstParagraph = decodedContent.match(/[^\r\n]+/);
-                if (firstParagraph && firstParagraph[0]) {
-                  description = firstParagraph[0].substring(0, 160); // Limit description length
-                }
-              }
-            }
-          } catch (dirError) {
-            console.log("Error fetching directory contents:", dirError);
-            // Continue with file display even if directory metadata fails
+      function fixRelativeImagePaths(markdown, filePath) {
+        const basePath = filePath.substring(0, filePath.lastIndexOf("/"));
+        return markdown.replace(
+          /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
+          (match, alt, relPath) => {
+            const fullPath = `${basePath}/${relPath}`.replace(/\/+/g, "/");
+            const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${fullPath}`;
+            return `![${alt}](${rawUrl})`;
           }
-          
-          // Update meta tags with file info
-          updateMetaTags(fileTitle, description, imagePath);
-          
-          const isPdf = filePath.toLowerCase().endsWith('.pdf');
-          
-          if (isPdf) {
-            // For PDFs, always fetch the raw content using download_url
-            if (fileData.download_url) {
-              try {
-                const pdfResponse = await fetch(fileData.download_url, { signal });
-                if (!pdfResponse.ok) throw new Error(`Failed to fetch PDF content: ${pdfResponse.status}`);
-                
-                // Create a blob with proper MIME type
-                const pdfBlob = await pdfResponse.blob();
-                const properPdfBlob = new Blob([pdfBlob], { type: 'application/pdf' });
-                const pdfUrl = URL.createObjectURL(properPdfBlob);
-                
-                // For Android, we'll use Google Docs viewer
-                const isAndroid = /Android/i.test(navigator.userAgent);
-                if (isAndroid) {
-                  const googleDocsUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileData.download_url)}`;
-                  displayFileContents(filePath, googleDocsUrl, true, 'android');
-                } else {
-                  displayFileContents(filePath, pdfUrl, true, 'desktop');
+        );
+      }
+
+      function toggleTheme() {
+        const isDark = document.body.getAttribute("data-theme") === "dark";
+        document.body.setAttribute("data-theme", isDark ? "light" : "dark");
+        localStorage.setItem("theme", isDark ? "light" : "dark");
+      }
+
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.body.setAttribute("data-theme", savedTheme);
+
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        headerIds: true,
+        mangle: false,
+        renderer: (function () {
+          const renderer = new marked.Renderer();
+          const originalParagraph = renderer.paragraph;
+          const emoji = new EmojiConvertor();
+          emoji.replace_mode = "unified";
+          emoji.allow_native = true;
+
+          renderer.paragraph = function (text) {
+            return originalParagraph.call(this, emoji.replace_colons(text));
+          };
+
+          return renderer;
+        })(),
+      });
+
+      // URL handling functions
+      function updateUrlWithPath(path, isFile = false) {
+        const hash = isFile
+          ? `#file=${encodeURIComponent(path)}`
+          : `#path=${encodeURIComponent(path)}`;
+        window.history.pushState(null, "", hash);
+      }
+
+      // Modified to be async
+      async function parseUrlForPath() {
+        const hash = window.location.hash;
+        try {
+          if (hash.startsWith("#file=")) {
+            const filePath = decodeURIComponent(hash.substring(6));
+            await viewFile(filePath);
+            return;
+          }
+          if (hash.startsWith("#path=")) {
+            const path = decodeURIComponent(hash.substring(6));
+            await navigateTo(path, false);
+            return;
+          }
+          // Default to root if no hash
+          await navigateTo("", false);
+        } catch (error) {
+          console.error("Error parsing URL path:", error);
+          document.getElementById(
+            "file-contents"
+          ).innerHTML = `<div class="error">Error loading content: ${error.message}</div>`;
+        }
+      }
+
+      function updateBreadcrumb(path) {
+        const parts = path ? path.split("/") : [];
+        const breadcrumb = document.getElementById("breadcrumb");
+
+        let html = `<a href="#" data-path="" class="navigation-link">DVS</a>`;
+        let currentPath = "";
+
+        parts.forEach((part, index) => {
+          currentPath += index === 0 ? part : "/" + part;
+          html += ` / <a href="#" data-path="${currentPath}" class="navigation-link">${part}</a>`;
+        });
+
+        breadcrumb.innerHTML = html;
+
+        // Add event listeners to the newly created breadcrumb links
+        document
+          .querySelectorAll("#breadcrumb .navigation-link")
+          .forEach((link) => {
+            link.addEventListener("click", function (e) {
+              e.preventDefault();
+              const path = this.getAttribute("data-path");
+              navigateTo(path);
+            });
+          });
+      }
+
+      async function fetchRepoContents(path = "") {
+        // Cancel any ongoing requests
+        if (currentRequestController) {
+          currentRequestController.abort();
+        }
+
+        // Create a new AbortController for this request
+        currentRequestController = new AbortController();
+        const signal = currentRequestController.signal;
+
+        const fileContents = document.getElementById("file-contents");
+        fileContents.innerHTML = '<div class="loading">Loading...</div>';
+
+        const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
+        try {
+          const response = await fetch(apiUrl, { signal });
+          if (response.ok) {
+            const contents = await response.json();
+            displayContents(contents, path);
+            fileContents.innerHTML = "";
+            updateBreadcrumb(path);
+          } else {
+            throw new Error(
+              `Failed to fetch contents: ${response.status} ${response.statusText}`
+            );
+          }
+        } catch (error) {
+          if (error.name === "AbortError") {
+            console.log("Fetch aborted due to new request");
+            return;
+          }
+          document.getElementById(
+            "file-list"
+          ).innerHTML = `<li class="error">Error fetching contents: ${error.message}</li>`;
+          fileContents.innerHTML = "";
+        }
+      }
+
+      function displayContents(contents, path) {
+        const fileList = document.getElementById("file-list");
+        fileList.innerHTML = "";
+
+        if (path !== "") {
+          const parentPath = path.substring(0, path.lastIndexOf("/"));
+          const parentItem = document.createElement("li");
+          const parentLink = document.createElement("a");
+          parentLink.href = "#";
+          parentLink.textContent = "..";
+          parentLink.setAttribute("data-path", parentPath);
+          parentLink.classList.add("navigation-link");
+          parentItem.appendChild(parentLink);
+          fileList.appendChild(parentItem);
+        }
+
+        // Sort contents: directories first, then files
+        contents.sort((a, b) => {
+          if (a.type !== b.type) {
+            return a.type === "dir" ? -1 : 1;
+          }
+          return a.name.localeCompare(b.name);
+        });
+
+        // Filter contents based on path and file type
+        const filteredContents = contents.filter((item) => {
+          // Hide assets folder when in root directory
+          if (path === "" && item.type === "dir" && item.name === "assets")
+            return false;
+
+          // Always show directories
+          if (item.type === "dir") return true;
+
+          // // Special case for assets folder - show no files
+          // if (path === 'assets') return false;
+
+          // For other paths, only show .md files
+          return item.name.toLowerCase().endsWith(".md");
+        });
+
+        filteredContents.forEach((item) => {
+          const listItem = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = "#";
+
+          if (item.type === "dir") {
+            link.textContent = `📁 ${item.name}/`;
+            link.setAttribute("data-path", item.path);
+            link.classList.add("navigation-link");
+          } else {
+            link.textContent = `📄 ${item.name}`;
+            link.setAttribute("data-file", item.path);
+            link.classList.add("file-link");
+          }
+
+          listItem.appendChild(link);
+          fileList.appendChild(listItem);
+        });
+
+        // Add event listeners to the newly created links
+        document
+          .querySelectorAll("#file-list .navigation-link")
+          .forEach((link) => {
+            link.addEventListener("click", function (e) {
+              e.preventDefault();
+              const path = this.getAttribute("data-path");
+              navigateTo(path);
+            });
+          });
+
+        document.querySelectorAll("#file-list .file-link").forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const filePath = this.getAttribute("data-file");
+            viewFile(filePath);
+          });
+        });
+      }
+
+      async function viewFile(filePath) {
+        // Cancel any ongoing requests
+        if (currentRequestController) {
+          currentRequestController.abort();
+        }
+
+        // Create a new AbortController for this request
+        currentRequestController = new AbortController();
+        const signal = currentRequestController.signal;
+
+        isViewingFile = true;
+        currentFile = filePath;
+        updateUrlWithPath(filePath, true);
+
+        const fileContents = document.getElementById("file-contents");
+        fileContents.innerHTML =
+          '<div class="loading">Loading file contents...</div>';
+
+        const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}?ref=${branch}`;
+
+        try {
+          const response = await fetch(apiUrl, { signal });
+          if (response.ok) {
+            const fileData = await response.json();
+            const fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+            const fileTitle = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
+
+            // Find the directory path
+            const dirPath = filePath.substring(0, filePath.lastIndexOf("/"));
+            let imagePath = null;
+            let description = "";
+
+            // Get directory metadata in a separate try/catch block to avoid failing the whole file load
+            try {
+              // Only fetch directory info if we don't already have it cached
+              const dirApiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${dirPath}?ref=${branch}`;
+              const dirResponse = await fetch(dirApiUrl, { signal });
+
+              if (dirResponse.ok) {
+                const dirContents = await dirResponse.json();
+
+                // Scan directory once for both image and markdown file in one pass
+                let imageFile = null;
+                let mdFile = null;
+
+                for (const item of dirContents) {
+                  // Check for image file
+                  if (!imageFile && /\.(jpe?g|png|gif)$/i.test(item.name)) {
+                    imageFile = item;
+                  }
+
+                  // Check for markdown file (potentially for description)
+                  if (!mdFile && item.name.toLowerCase().endsWith(".md")) {
+                    mdFile = item;
+                  }
+
+                  // If we found both, we can stop scanning
+                  if (imageFile && mdFile) break;
                 }
-              } catch (pdfError) {
-                if (pdfError.name === 'AbortError') {
-                  console.log('PDF fetch aborted due to new request');
-                  return;
+
+                if (imageFile) {
+                  imagePath = imageFile.download_url;
                 }
-                throw new Error(`PDF loading error: ${pdfError.message}`);
+
+                // For markdown files, try to extract first paragraph for description
+                if (
+                  filePath.toLowerCase().endsWith(".md") &&
+                  fileData.content
+                ) {
+                  const decodedContent = atob(
+                    fileData.content.replace(/\n/g, "")
+                  );
+                  const firstParagraph = decodedContent.match(/[^\r\n]+/);
+                  if (firstParagraph && firstParagraph[0]) {
+                    description = firstParagraph[0].substring(0, 160); // Limit description length
+                  }
+                }
+              }
+            } catch (dirError) {
+              console.log("Error fetching directory contents:", dirError);
+              // Continue with file display even if directory metadata fails
+            }
+
+            // Update meta tags with file info
+            updateMetaTags(fileTitle, description, imagePath);
+
+            const isPdf = filePath.toLowerCase().endsWith(".pdf");
+
+            if (isPdf) {
+              // For PDFs, always fetch the raw content using download_url
+              if (fileData.download_url) {
+                try {
+                  const pdfResponse = await fetch(fileData.download_url, {
+                    signal,
+                  });
+                  if (!pdfResponse.ok)
+                    throw new Error(
+                      `Failed to fetch PDF content: ${pdfResponse.status}`
+                    );
+
+                  // Create a blob with proper MIME type
+                  const pdfBlob = await pdfResponse.blob();
+                  const properPdfBlob = new Blob([pdfBlob], {
+                    type: "application/pdf",
+                  });
+                  const pdfUrl = URL.createObjectURL(properPdfBlob);
+
+                  // For Android, we'll use Google Docs viewer
+                  const isAndroid = /Android/i.test(navigator.userAgent);
+                  if (isAndroid) {
+                    const googleDocsUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+                      fileData.download_url
+                    )}`;
+                    displayFileContents(
+                      filePath,
+                      googleDocsUrl,
+                      true,
+                      "android"
+                    );
+                  } else {
+                    displayFileContents(filePath, pdfUrl, true, "desktop");
+                  }
+                } catch (pdfError) {
+                  if (pdfError.name === "AbortError") {
+                    console.log("PDF fetch aborted due to new request");
+                    return;
+                  }
+                  throw new Error(`PDF loading error: ${pdfError.message}`);
+                }
+              } else {
+                throw new Error("PDF download URL not available");
               }
             } else {
-              throw new Error('PDF download URL not available');
+              // Handle other file types
+              if (fileData.content) {
+                const decodedContent = atob(
+                  fileData.content.replace(/\n/g, "")
+                );
+                displayFileContents(filePath, decodedContent, false);
+              } else if (fileData.download_url) {
+                try {
+                  const textResponse = await fetch(fileData.download_url, {
+                    signal,
+                  });
+                  if (!textResponse.ok)
+                    throw new Error(
+                      `Failed to fetch text content: ${textResponse.status}`
+                    );
+
+                  const textContent = await textResponse.text();
+                  displayFileContents(filePath, textContent, false);
+                } catch (textError) {
+                  if (textError.name === "AbortError") {
+                    console.log("Text fetch aborted due to new request");
+                    return;
+                  }
+                  throw new Error(`Text loading error: ${textError.message}`);
+                }
+              } else {
+                throw new Error("No content available");
+              }
             }
           } else {
-            // Handle other file types
-            if (fileData.content) {
-              const decodedContent = atob(fileData.content.replace(/\n/g, ''));
-              displayFileContents(filePath, decodedContent, false);
-            } else if (fileData.download_url) {
-              try {
-                const textResponse = await fetch(fileData.download_url, { signal });
-                if (!textResponse.ok) throw new Error(`Failed to fetch text content: ${textResponse.status}`);
-                
-                const textContent = await textResponse.text();
-                displayFileContents(filePath, textContent, false);
-              } catch (textError) {
-                if (textError.name === 'AbortError') {
-                  console.log('Text fetch aborted due to new request');
-                  return;
-                }
-                throw new Error(`Text loading error: ${textError.message}`);
-              }
-            } else {
-              throw new Error('No content available');
-            }
+            throw new Error(
+              `Failed to load file: ${response.status} ${response.statusText}`
+            );
           }
-        } else {
-          throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
+        } catch (error) {
+          if (error.name === "AbortError") {
+            console.log("File view aborted due to new request");
+            return;
+          }
+          fileContents.innerHTML = `<div class="error">Error loading file contents: ${error.message}</div>`;
         }
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('File view aborted due to new request');
-          return;
-        }
-        fileContents.innerHTML = `<div class="error">Error loading file contents: ${error.message}</div>`;
       }
-    }
 
-    function displayFileContents(filePath, content, isPdf, platform = 'desktop') {
-      const fileContentsDiv = document.getElementById('file-contents');
-      let html = `<div class="file-header">${filePath}</div>`;
-      
-      if (isPdf) {
-        if (platform === 'android') {
-          // Use Google Docs viewer for Android
-          html += `
+      function displayFileContents(
+        filePath,
+        content,
+        isPdf,
+        platform = "desktop"
+      ) {
+        const fileContentsDiv = document.getElementById("file-contents");
+        let html = `<div class="file-header">${filePath}</div>`;
+
+        if (isPdf) {
+          if (platform === "android") {
+            // Use Google Docs viewer for Android
+            html += `
             <div class="pdf-container">
               <iframe 
                 class="pdf-viewer" 
@@ -630,16 +690,16 @@
               ></iframe>
             </div>
             <div style="margin-top: 10px; text-align: center;">
-              <a href="${content.replace('gview?embedded=true&', '')}" 
+              <a href="${content.replace("gview?embedded=true&", "")}" 
                  target="_blank" 
                  class="theme-toggle" 
                  style="text-decoration: none;">
                 Open in New Tab
               </a>
             </div>`;
-        } else {
-          // Use native PDF viewer for desktop
-          html += `
+          } else {
+            // Use native PDF viewer for desktop
+            html += `
             <div class="pdf-container">
               <iframe 
                 class="pdf-viewer" 
@@ -655,140 +715,143 @@
                 Open in New Tab
               </a>
             </div>`;
-        }
-        
-        // Clean up the object URL when the content changes
-        if (platform === 'desktop') {
-          const cleanup = () => {
-            URL.revokeObjectURL(content);
-            fileContentsDiv.removeEventListener('DOMNodeRemoved', cleanup);
-          };
-          fileContentsDiv.addEventListener('DOMNodeRemoved', cleanup);
-        }
-      } else {
-        const isMarkdown = filePath.toLowerCase().endsWith('.md');
-        if (isMarkdown) {
-          const fixedContent = fixRelativeImagePaths(content, filePath);
-          const renderedContent = marked.parse(fixedContent);
-          html += `<div class="markdown-body">${renderedContent}</div>`;
-        } else {
-          html += `<pre><code>${escapeHtml(content)}</code></pre>`;
-        }
-      }
-      
-      fileContentsDiv.innerHTML = html;
-      
-      // Update breadcrumb to show the path to the file
-      const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
-      updateBreadcrumb(dirPath);
-    }
+          }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    async function navigateTo(path, updateUrl = true) {
-      // Cancel any ongoing requests
-      if (currentRequestController) {
-        currentRequestController.abort();
-      }
-      
-      // Create a new AbortController for this request
-      currentRequestController = new AbortController();
-      const signal = currentRequestController.signal;
-      
-      currentPath = path;
-      isViewingFile = false;
-      currentFile = null;
-      
-      if (updateUrl) {
-        updateUrlWithPath(path, false);
-      }
-      
-      try {
-        // Try to update meta tags based on directory
-        if (path) {
-          const dirName = path.split('/').pop() || "DVS";
-          const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
-          
-          const response = await fetch(apiUrl, { signal });
-          if (response.ok) {
-            const contents = await response.json();
-            
-            // Scan directory contents once for both image and readme files
-            let imageFile = null;
-            let readmeFile = null;
-            
-            for (const item of contents) {
-              // Check for image files
-              if (!imageFile && /\.(jpe?g|png|gif)$/i.test(item.name)) {
-                imageFile = item;
-              }
-              
-              // Look specifically for README.md to use for description
-              if (!readmeFile && item.name.toLowerCase() === 'readme.md') {
-                readmeFile = item;
-              }
-              
-              // If we found both, stop scanning
-              if (imageFile && readmeFile) break;
-            }
-            
-            let description = "Directory contents";
-            let imagePath = null;
-            
-            if (imageFile) {
-              imagePath = imageFile.download_url;
-            }
-            
-            // Try to get description from README.md if present
-            if (readmeFile) {
-              try {
-                const readmeResponse = await fetch(readmeFile.download_url, { signal });
-                if (readmeResponse.ok) {
-                  const readmeText = await readmeResponse.text();
-                  const firstParagraph = readmeText.match(/[^\r\n]+/);
-                  if (firstParagraph && firstParagraph[0]) {
-                    description = firstParagraph[0].substring(0, 160);
-                  }
-                }
-              } catch (readmeError) {
-                console.log("Error fetching README:", readmeError);
-              }
-            }
-            
-            // Update meta tags for the directory
-            updateMetaTags(dirName, description, imagePath);
+          // Clean up the object URL when the content changes
+          if (platform === "desktop") {
+            const cleanup = () => {
+              URL.revokeObjectURL(content);
+              fileContentsDiv.removeEventListener("DOMNodeRemoved", cleanup);
+            };
+            fileContentsDiv.addEventListener("DOMNodeRemoved", cleanup);
           }
         } else {
-          // Reset to default meta tags for home page
-          updateMetaTags(null, null, null);
+          const isMarkdown = filePath.toLowerCase().endsWith(".md");
+          if (isMarkdown) {
+            const fixedContent = fixRelativeImagePaths(content, filePath);
+            const renderedContent = marked.parse(fixedContent);
+            html += `<div class="markdown-body">${renderedContent}</div>`;
+          } else {
+            html += `<pre><code>${escapeHtml(content)}</code></pre>`;
+          }
         }
-        
-        // Now fetch and display the directory contents
-        await fetchRepoContents(path);
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Navigation aborted due to new request');
-          return;
-        }
-        console.error("Error navigating to path:", error);
-        document.getElementById('file-contents').innerHTML = 
-          `<div class="error">Error loading directory: ${error.message}</div>`;
+
+        fileContentsDiv.innerHTML = html;
+
+        // Update breadcrumb to show the path to the file
+        const dirPath = filePath.substring(0, filePath.lastIndexOf("/"));
+        updateBreadcrumb(dirPath);
       }
-    }
 
-    // Handle browser back/forward buttons
-    window.addEventListener('popstate', async function() {
-      await parseUrlForPath();
-    });
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
 
-    // Initial load - parse URL for path or file
-    document.addEventListener('DOMContentLoaded', async function() {
-      await parseUrlForPath();
-    });
-  </script>
-</body>
+      async function navigateTo(path, updateUrl = true) {
+        // Cancel any ongoing requests
+        if (currentRequestController) {
+          currentRequestController.abort();
+        }
+
+        // Create a new AbortController for this request
+        currentRequestController = new AbortController();
+        const signal = currentRequestController.signal;
+
+        currentPath = path;
+        isViewingFile = false;
+        currentFile = null;
+
+        if (updateUrl) {
+          updateUrlWithPath(path, false);
+        }
+
+        try {
+          // Try to update meta tags based on directory
+          if (path) {
+            const dirName = path.split("/").pop() || "DVS";
+            const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`;
+
+            const response = await fetch(apiUrl, { signal });
+            if (response.ok) {
+              const contents = await response.json();
+
+              // Scan directory contents once for both image and readme files
+              let imageFile = null;
+              let readmeFile = null;
+
+              for (const item of contents) {
+                // Check for image files
+                if (!imageFile && /\.(jpe?g|png|gif)$/i.test(item.name)) {
+                  imageFile = item;
+                }
+
+                // Look specifically for README.md to use for description
+                if (!readmeFile && item.name.toLowerCase() === "readme.md") {
+                  readmeFile = item;
+                }
+
+                // If we found both, stop scanning
+                if (imageFile && readmeFile) break;
+              }
+
+              let description = "Directory contents";
+              let imagePath = null;
+
+              if (imageFile) {
+                imagePath = imageFile.download_url;
+              }
+
+              // Try to get description from README.md if present
+              if (readmeFile) {
+                try {
+                  const readmeResponse = await fetch(readmeFile.download_url, {
+                    signal,
+                  });
+                  if (readmeResponse.ok) {
+                    const readmeText = await readmeResponse.text();
+                    const firstParagraph = readmeText.match(/[^\r\n]+/);
+                    if (firstParagraph && firstParagraph[0]) {
+                      description = firstParagraph[0].substring(0, 160);
+                    }
+                  }
+                } catch (readmeError) {
+                  console.log("Error fetching README:", readmeError);
+                }
+              }
+
+              // Update meta tags for the directory
+              updateMetaTags(dirName, description, imagePath);
+            }
+          } else {
+            // Reset to default meta tags for home page
+            updateMetaTags(null, null, null);
+          }
+
+          // Now fetch and display the directory contents
+          await fetchRepoContents(path);
+        } catch (error) {
+          if (error.name === "AbortError") {
+            console.log("Navigation aborted due to new request");
+            return;
+          }
+          console.error("Error navigating to path:", error);
+          document.getElementById(
+            "file-contents"
+          ).innerHTML = `<div class="error">Error loading directory: ${error.message}</div>`;
+        }
+      }
+
+      // Handle browser back/forward buttons
+      window.addEventListener("popstate", async function () {
+        await parseUrlForPath();
+      });
+
+      // Initial load - parse URL for path or file
+      document.addEventListener("DOMContentLoaded", async function () {
+        await parseUrlForPath();
+      });
+    </script>
+  </body>
 </html>
