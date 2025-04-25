@@ -1,6 +1,8 @@
 Let's taste some maddur vada today, but unfortunaterly mom has given a small slat circular box case, so how do I fit all 6 in them?
-Take three at a time and make a triangle of them and stack one more on top for it. Like a flower. 
-![vada](./IMG_20250417_082433068.jpg)]  
+Take three at a time and make a triangle of them and stack one more on top for it. Like a flower.  
+
+![vada](./IMG_20250417_082433068.jpg)  
+
 
 
 Supposedly a proof about why this is the best arrangement goes back to stacking cannonballs, Honey combs, plant cell walls etc., 
