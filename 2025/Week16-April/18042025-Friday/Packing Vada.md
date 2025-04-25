@@ -5,7 +5,7 @@ Take three at a time and make a triangle of them and stack one more on top for i
 
 Supposedly a proof about why this is the best arrangement goes back to stacking cannonballs, Honey combs, plant cell walls etc., 
 
-Watch this veritiasium video (https://www.youtube.com/watch?v=48sCx-wBs34) that goes into this in much more depth
+Watch this [veritiasium video](https://www.youtube.com/watch?v=48sCx-wBs34) that goes into this in much more depth
 
 The main idea which works here is irrationality. The [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) given by the solution for x in the equation x - 1/x =1.  
 
