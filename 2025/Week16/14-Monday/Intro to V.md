@@ -1,3 +1,5 @@
+14/04/2025
+
 I'll start today with a quote from one of my favorite movie/book - V for Vendetta
 
 **Voila! In view, a humble vaudevillian veteran cast vicariously as both victim and villain by the vicissitudes of fate.....**

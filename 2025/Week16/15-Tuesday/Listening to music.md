@@ -1,3 +1,5 @@
+15/04/2025
+
 [Kaahe Chhed](https://open.spotify.com/track/7LgYx8FPuRvjSaFKw4ImIT?si=cee7936015b9444b) (Link redirects to Spotify to play song)
 
 Today we'll listen to a song from the movie Devdas (2002), Kahe Chhed Mohe featuring vocals form [Kavita Krishnamurthy](https://en.wikipedia.org/wiki/Kavita_Krishnamurti), [Pandit Birju Maharaj](https://en.wikipedia.org/wiki/Birju_Maharaj) and [Madhuri Dixit](https://en.wikipedia.org/wiki/Madhuri_Dixit). For those unitiated to Indian Classical music or dance these names maybe unfamiliar, I've attached their wiki pages for info.

@@ -1,3 +1,5 @@
+19/04/2025
+
 Here's a small joke.  
 
 ![Wet Paper Cups](./IMG_20250418_221426169.jpg)  
