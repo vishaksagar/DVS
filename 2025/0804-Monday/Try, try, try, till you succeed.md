@@ -1,6 +1,6 @@
 04/08/2025
 
-![Ozymandias](https://github.com/vishaksagar/DVS/blob/main/2025/0804-Monday/IMG_20250805_101410032.jpg)
+![Ozymandias](./IMG_20250805_101410032.jpg)
 
 ## Try
 As kids, we were told a story called the Spider and the King emphasizing the virtues of patience and perseverance. The story went like, once upon a time, there was king who had lost his kingdom to an enemy nation, he escaped to a cave with his army. There he saw a spider repeatedly trying to build a web, failing, but not giving up. The spider persevered and eventually succeeded in building the web. Inspired by it, the king  took up the challenge to regain his kingdom and eventually after many failed attempts succeeded.
@@ -63,33 +63,33 @@ Urdu verse:
 ###
 Translation:
 
-I will accumulate wealth and riches — but then what?
+I will accumulate wealth and riches - but then what?
 
-I will buy myself a grand, luxurious home — but then what?
+I will buy myself a grand, luxurious home - but then what?
 
-If I crave wine, I’ll become a carefree drunkard,
+If I crave wine, I'll become a carefree drunkard,
 
-I’ll wander from tavern to tavern — but then what?
+I'll wander from tavern to tavern - but then what?
 
-If I’m drawn toward beauty and romantic whispers,
+If I'm drawn toward beauty and romantic whispers,
 
-I’ll lose myself in flowing tresses at dawn — but then what?
+I'll lose myself in flowing tresses at dawn - but then what?
 
-I’ll grace poetic gatherings with eloquence and verse,
+I'll grace poetic gatherings with eloquence and verse,
 
-My name will echo in the world — but then what?
+My name will echo in the world - but then what?
 
-In a wave of joy, I’ll travel the entire world,
+In a wave of joy, I'll travel the entire world,
 
-But in the end, I’ll return to my old town — and then what?
+But in the end, I'll return to my old town - and then what?
 
 One day, death will knock at the door of life,
 
-The lamp of Qamar (the poet) will be extinguished — and then what?
+The lamp of Qamar (the poet) will be extinguished - and then what?
 
 I rose from dust, and to dust I shall return,
 
-After that, who knows what comes? — what then?
+After that, who knows what comes? - what then?
 
 ###
 -The Silent Librarian
