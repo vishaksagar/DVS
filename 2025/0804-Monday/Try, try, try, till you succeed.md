@@ -1,6 +1,6 @@
 04/08/2025
 
-!([Ozymandias]https://github.com/vishaksagar/DVS/blob/main/2025/0804-Monday/IMG_20250805_101410032.jpg)
+![Ozymandias](https://github.com/vishaksagar/DVS/blob/main/2025/0804-Monday/IMG_20250805_101410032.jpg)
 
 ## Try
 As kids, we were told a story called the Spider and the King emphasizing the virtues of patience and perseverance. The story went like, once upon a time, there was king who had lost his kingdom to an enemy nation, he escaped to a cave with his army. There he saw a spider repeatedly trying to build a web, failing, but not giving up. The spider persevered and eventually succeeded in building the web. Inspired by it, the king  took up the challenge to regain his kingdom and eventually after many failed attempts succeeded.
